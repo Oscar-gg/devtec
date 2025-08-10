@@ -1,69 +1,62 @@
-import Link from "next/link";
+import { TrendingHeader } from "./trending/_components/trending-header";
+import { FilterBar } from "./trending/_components/filter-bar";
+import { LanguageChart } from "./trending/_components/language-chart";
+import { RepositoryGrid } from "./trending/_components/repository-grid";
 
-import { LatestPost } from "~/app/_components/post";
-import { auth } from "~/server/auth";
-import { api, HydrateClient } from "~/trpc/server";
-
-export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
-  const session = await auth();
-
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
-  }
-
+export default function TrendingPage() {
   return (
-    <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
+    <div className="min-h-screen bg-[#121212] text-[#E0E0E0]">
+      <TrendingHeader />
+      <FilterBar />
 
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-                {session && <span>Logged in as {session.user?.name}</span>}
-              </p>
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
-            </div>
+      <main className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Language Distribution Chart */}
+          <div className="lg:col-span-1">
+            <LanguageChart />
           </div>
 
-          {session?.user && <LatestPost />}
+          {/* Repository Grid */}
+          <div className="lg:col-span-2">
+            <RepositoryGrid />
+          </div>
         </div>
       </main>
-    </HydrateClient>
+
+      {/* Footer */}
+      <footer className="mt-16 border-t border-gray-800 bg-[#1E1E1E] py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-between md:flex-row">
+            <p className="text-sm text-[#A0A0A0]">
+              © 2025 TecDev. Discover projects, developers, and organizations
+              in the Tec community.
+            </p>
+            <div className="mt-4 flex space-x-6 md:mt-0">
+              <a
+                href="https://github.com/Oscar-gg/tecdev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#A0A0A0] transition-colors duration-200 hover:text-[#8B5CF6]"
+                aria-label="View on GitHub"
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+              </a>
+              <a
+                href="#"
+                className="text-[#A0A0A0] transition-colors duration-200 hover:text-[#3B82F6]"
+              >
+                Contribute
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }
