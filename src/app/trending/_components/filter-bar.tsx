@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 
 export function FilterBar() {
   const [selectedLanguage, setSelectedLanguage] = useState("All Languages");
   const [selectedPeriod, setSelectedPeriod] = useState("Today");
   const [selectedSort, setSelectedSort] = useState("Stars");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const languages = [
     "All Languages",
@@ -26,15 +30,36 @@ export function FilterBar() {
   const sortOptions = ["Stars", "Forks", "Issues", "Updated"];
 
   return (
-    <div className="border-b border-gray-800 bg-[#1E1E1E] py-4">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-          {/* Language Filter */}
+    <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
+      <h2 className="mb-4 text-lg font-semibold text-[#E0E0E0]">
+        Filter & Search
+      </h2>
+
+      {/* Search Bar */}
+      <div className="mb-4">
+        <div className="relative">
+          <MagnifyingGlassIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-[#A0A0A0]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search repositories..."
+            className="w-full rounded-lg border border-gray-700 bg-[#121212] py-2 pr-4 pl-10 text-[#E0E0E0] placeholder-[#A0A0A0] transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-[#8B5CF6] focus:outline-none"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Language Filter */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-[#A0A0A0]">
+            Language
+          </label>
           <div className="relative">
             <select
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
-              className="min-w-[150px] cursor-pointer appearance-none rounded-lg border border-gray-700 bg-[#121212] px-4 py-2 pr-8 text-sm text-[#E0E0E0] transition-all duration-200 hover:border-[#8B5CF6] focus:border-transparent focus:ring-2 focus:ring-[#8B5CF6] focus:outline-none"
+              className="w-full cursor-pointer appearance-none rounded-lg border border-gray-700 bg-[#121212] px-4 py-2 pr-8 text-sm text-[#E0E0E0] transition-all duration-200 hover:border-[#8B5CF6] focus:border-transparent focus:ring-2 focus:ring-[#8B5CF6] focus:outline-none"
             >
               {languages.map((lang) => (
                 <option
@@ -48,13 +73,18 @@ export function FilterBar() {
             </select>
             <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2 transform text-[#A0A0A0]" />
           </div>
+        </div>
 
-          {/* Time Period Filter */}
+        {/* Time Period Filter */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-[#A0A0A0]">
+            Period
+          </label>
           <div className="relative">
             <select
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="min-w-[120px] cursor-pointer appearance-none rounded-lg border border-gray-700 bg-[#121212] px-4 py-2 pr-8 text-sm text-[#E0E0E0] transition-all duration-200 hover:border-[#8B5CF6] focus:border-transparent focus:ring-2 focus:ring-[#8B5CF6] focus:outline-none"
+              className="w-full cursor-pointer appearance-none rounded-lg border border-gray-700 bg-[#121212] px-4 py-2 pr-8 text-sm text-[#E0E0E0] transition-all duration-200 hover:border-[#8B5CF6] focus:border-transparent focus:ring-2 focus:ring-[#8B5CF6] focus:outline-none"
             >
               {periods.map((period) => (
                 <option
@@ -68,13 +98,18 @@ export function FilterBar() {
             </select>
             <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2 transform text-[#A0A0A0]" />
           </div>
+        </div>
 
-          {/* Sort Filter */}
+        {/* Sort Filter */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-[#A0A0A0]">
+            Sort by
+          </label>
           <div className="relative">
             <select
               value={selectedSort}
               onChange={(e) => setSelectedSort(e.target.value)}
-              className="min-w-[100px] cursor-pointer appearance-none rounded-lg border border-gray-700 bg-[#121212] px-4 py-2 pr-8 text-sm text-[#E0E0E0] transition-all duration-200 hover:border-[#8B5CF6] focus:border-transparent focus:ring-2 focus:ring-[#8B5CF6] focus:outline-none"
+              className="w-full cursor-pointer appearance-none rounded-lg border border-gray-700 bg-[#121212] px-4 py-2 pr-8 text-sm text-[#E0E0E0] transition-all duration-200 hover:border-[#8B5CF6] focus:border-transparent focus:ring-2 focus:ring-[#8B5CF6] focus:outline-none"
             >
               {sortOptions.map((sort) => (
                 <option
@@ -88,10 +123,12 @@ export function FilterBar() {
             </select>
             <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2 transform text-[#A0A0A0]" />
           </div>
+        </div>
 
-          {/* Results Count */}
-          <div className="ml-auto flex items-center text-sm text-[#A0A0A0]">
-            <span>Showing 1-25 of 1,234 repositories</span>
+        {/* Results Count */}
+        <div className="border-t border-gray-700 pt-4">
+          <div className="text-sm text-[#A0A0A0]">
+            <span>1,234 repositories found</span>
           </div>
         </div>
       </div>

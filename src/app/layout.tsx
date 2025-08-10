@@ -8,7 +8,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 export const metadata: Metadata = {
   title: "TecDev - Browse Community Projects",
   description:
-    "Discover projects, developers, and organizations in the Tec community. Explore projects to contribute or use!",
+    "Discover projects, developers, and organizations related to the Tec community. Explore projects to contribute or use!",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

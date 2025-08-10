@@ -7,13 +7,15 @@ export default function TrendingPage() {
   return (
     <div className="min-h-screen bg-[#121212] text-[#E0E0E0]">
       <TrendingHeader />
-      <FilterBar />
 
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Language Distribution Chart */}
           <div className="lg:col-span-1">
-            <LanguageChart />
+            <FilterBar />
+            <div className="mt-6">
+              <LanguageChart />
+            </div>
           </div>
 
           {/* Repository Grid */}
@@ -29,7 +31,7 @@ export default function TrendingPage() {
           <div className="flex flex-col items-center justify-between md:flex-row">
             <p className="text-sm text-[#A0A0A0]">
               © 2025 TecDev. Discover projects, developers, and organizations
-              in the Tec community.
+              related to the Tec community.
             </p>
             <div className="mt-4 flex space-x-6 md:mt-0">
               <a
