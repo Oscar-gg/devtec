@@ -20,9 +20,9 @@ export const Header = () => {
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6]">
-              <span className="text-lg font-bold text-white">T</span>
+              <span className="text-lg font-bold text-white">D</span>
             </div>
-            <h1 className="text-xl font-bold text-white">TecDev</h1>
+            <h1 className="text-xl font-bold text-white">DevTec</h1>
           </div>
 
           <div className="flex items-center gap-4">

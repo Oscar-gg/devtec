@@ -8,7 +8,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
-  title: "TecDev - Browse Community Projects",
+  title: "DevTec - Browse Community Projects",
   description:
     "Discover projects, developers, and organizations related to the Tec community. Explore projects to contribute or use!",
   icons: [{ rel: "icon", url: "/favicon.ico" }],

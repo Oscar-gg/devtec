@@ -4,12 +4,12 @@ export const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center justify-between md:flex-row">
           <p className="text-sm text-[#A0A0A0]">
-            © 2025 TecDev. Discover projects, developers, and organizations
+            © 2025 DevTec. Discover projects, developers, and organizations
             related to the Tec community.
           </p>
           <div className="mt-4 flex space-x-6 md:mt-0">
             <a
-              href="https://github.com/Oscar-gg/tecdev"
+              href="https://github.com/Oscar-gg/devtec"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#A0A0A0] transition-colors duration-200 hover:text-[#8B5CF6]"
