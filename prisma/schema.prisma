@@ -14,18 +14,6 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
-}
-
 // Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
@@ -55,14 +43,127 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
+    id              String           @id @default(cuid())
+    name            String?
+    email           String?          @unique
+    schoolEmail     String?          @unique
+    emailVerified   DateTime?
+    image           String?
+    profileImage    String?
+    accounts        Account[]
+    sessions        Session[]
+    workExperience  WorkExperience[]
+    organizations   Organization[]
+    userPreferences UserPreferences?
+    projectUpvote   ProjectUpvote[]
+    project         Project[]
+    UserProject     UserProject[]
+    UserLink        UserLink[]
+}
+
+model UserPreferences {
+    id                  String  @id @default(cuid())
+    userId              String  @unique
+    user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    showGenericImage    Boolean @default(false)
+    showEmail           Boolean @default(false)
+    showSchoolEmail     Boolean @default(false)
+    showProfile         Boolean @default(true)
+    showWorkExperience  Boolean @default(true)
+    showOrganizations   Boolean @default(true)
+    showRelatedProjects Boolean @default(true)
+}
+
+model Organization {
+    id          String  @id @default(cuid())
+    name        String
+    description String?
+    logo        String?
+    url         String
+    user        User[]
+    approved    Boolean @default(false)
+
+    @@index([name])
+}
+
+model WorkExperience {
+    id        String    @id @default(cuid())
+    startDate DateTime
+    endDate   DateTime?
+    position  String
+    location  String?
+    companyId String
+    company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    userId    String    @unique
+    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Company {
+    id             String           @id @default(cuid())
+    name           String
+    logo           String?
+    WorkExperience WorkExperience[]
+
+    @@index([name])
+}
+
+model ProjectUpvote {
+    id        String  @id @default(cuid())
+    userId    String
+    projectId String
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, projectId])
+}
+
+model UserProject {
+    id        String  @id @default(cuid())
+    userId    String
+    projectId String
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, projectId])
+}
+
+model Project {
+    id            String          @id @default(cuid())
+    name          String
+    description   String
+    githubUrl     String?
+    deploymentUrl String?
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @updatedAt
+    tags          Tag[]
+    userId        String?
+    ProjectUpvote ProjectUpvote[]
+    User          User?           @relation(fields: [userId], references: [id])
+    UserProject   UserProject[]
+}
+
+model UserLink {
+    id         String   @id @default(cuid())
+    url        String
+    userId     String
+    user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    linkTypeId String
+    linkType   LinkType @relation(fields: [linkTypeId], references: [id], onDelete: Cascade)
+}
+
+model LinkType {
+    id       String     @id @default(cuid())
+    name     String
+    logo     String
+    UserLink UserLink[]
+}
+
+model Tag {
+    id        String   @id @default(cuid())
+    name      String   @unique
+    color     String
+    project   Project? @relation(fields: [projectId], references: [id])
+    projectId String?
 }
 
 model VerificationToken {
