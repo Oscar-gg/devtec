@@ -2,8 +2,10 @@ import "~/styles/globals.css";
 
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
-
+import { Footer } from "./_components/footer";
+import { Header } from "./_components/header";
 import { TRPCReactProvider } from "~/trpc/react";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: "TecDev - Browse Community Projects",
@@ -23,7 +25,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable} dark`}>
       <body className="bg-[#121212] text-[#E0E0E0]">
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <SessionProvider>
+          <Header />
+
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <Footer />
+        </SessionProvider>
       </body>
     </html>
   );
