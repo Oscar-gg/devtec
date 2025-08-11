@@ -3,6 +3,7 @@ import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import GitHub from "next-auth/providers/github";
 
 import { db } from "~/server/db";
+import { getEmails } from "~/utils/backend/github";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -32,7 +33,17 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    GitHub,
+    GitHub({
+      authorization: {
+        url: "https://github.com/login/oauth/authorize",
+        params: {
+          scope: "read:user user:email",
+          prompt: "select_account",
+        },
+      },
+      // Handle email override in callback. Safe to add as github verifies emails.
+      allowDangerousEmailAccountLinking: true,
+    }),
     /**
      * ...add more providers here.
      *
@@ -45,6 +56,28 @@ export const authConfig = {
   ],
   adapter: PrismaAdapter(db),
   callbacks: {
+    async signIn({ profile, account, user }) {
+      const allowedDomain = "tec.mx";
+
+      // Check if primary email has the allowed domain
+      if (profile?.email?.endsWith(`@${allowedDomain}`)) {
+        return true;
+      }
+
+      // Check if any verified email has the allowed domain
+      if (account?.access_token?.toString()) {
+        const associatedEmails = await getEmails(account?.access_token);
+
+        for (const email of associatedEmails) {
+          if (email.verified && email.email.endsWith(`@${allowedDomain}`)) {
+            user.email = email.email; // Save tec email
+            return true;
+          }
+        }
+      }
+
+      return false;
+    },
     session: ({ session, user }) => ({
       ...session,
       user: {
