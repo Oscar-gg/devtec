@@ -128,22 +128,23 @@ model UserProject {
 }
 
 model Project {
-    id             String        @id @default(cuid())
-    name           String
-    description    String
-    category       String
-    githubUrl      String?
-    deploymentUrl  String?
-    stars          Int?          @default(0)
-    forks          Int?          @default(0)
-    createdAt      DateTime      @default(now())
-    uploadedAt     DateTime      @default(now())
-    updatedAt      DateTime      @updatedAt
-    organizationId String?
-    organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-    tags           Tag[]
-    projectLike    ProjectLike[]
-    userProject    UserProject[]
+    id                  String        @id @default(cuid())
+    name                String
+    description         String
+    category            String
+    githubUrl           String?
+    deploymentUrl       String?
+    stars               Int?          @default(0)
+    forks               Int?          @default(0)
+    createdAt           DateTime      @default(now())
+    uploadedAt          DateTime      @default(now())
+    updatedAt           DateTime      @updatedAt
+    organizationId      String?
+    programmingLanguage String?
+    organization        Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    tags                Tag[]
+    projectLike         ProjectLike[]
+    userProject         UserProject[]
 }
 
 model UserLink {
