@@ -32,6 +32,9 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authConfig = {
+  pages: {
+    error: "/auth/error",
+  },
   providers: [
     GitHub({
       authorization: {

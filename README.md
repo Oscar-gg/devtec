@@ -61,9 +61,10 @@ Deployment
 
 Projects
 
-- [ ] Show projects on homepage instead of mock data
 - [x] Complete README and contribution guide
-- [ ] Improve denied auth page (non-domain users)
+- [x] Improve denied auth page (non-domain users)
+- [ ] Show projects on homepage instead of mock data
+- [ ] Implement tags for projects
 - [ ] Update and Delete projects
 - [ ] Filter projects
 - [ ] Language distribution chart

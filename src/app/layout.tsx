@@ -30,7 +30,7 @@ export default function RootLayout({
           <Header />
 
           <TRPCReactProvider>
-            <div className="min-h-screen text-[#E0E0E0]">{children}</div>
+            <div className="min-h-[76vh] text-[#E0E0E0]">{children}</div>
           </TRPCReactProvider>
           <Footer />
         </SessionProvider>
