@@ -20,6 +20,8 @@ interface Repository {
   homepage?: string;
 }
 
+import { Button } from "~/app/_components/button";
+
 export function RepositoryGrid() {
   const repositories: Repository[] = [
     {
@@ -118,7 +120,7 @@ export function RepositoryGrid() {
         {repositories.map((repo) => (
           <div
             key={repo.id}
-            className="group rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200 hover:border-[#8B5CF6]/50 hover:shadow-lg hover:shadow-[#8B5CF6]/10"
+            className="group cursor-pointer rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200 hover:border-[#8B5CF6]/50 hover:shadow-lg hover:shadow-[#8B5CF6]/10"
           >
             {/* Repository Header */}
             <div className="mb-4 flex items-start justify-between">
@@ -204,9 +206,7 @@ export function RepositoryGrid() {
 
       {/* Load More Button */}
       <div className="flex justify-center pt-6">
-        <button className="rounded-lg bg-[#8B5CF6] px-6 py-3 font-medium text-white transition-all duration-200 hover:bg-[#7C3AED] hover:shadow-lg hover:shadow-[#8B5CF6]/30">
-          Load More Repositories
-        </button>
+        <Button>Load More Repositories</Button>
       </div>
     </div>
   );

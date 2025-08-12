@@ -55,8 +55,7 @@ model User {
     workExperience  WorkExperience[]
     organizations   Organization[]
     userPreferences UserPreferences?
-    projectUpvote   ProjectUpvote[]
-    project         Project[]
+    projectLike     ProjectLike[]
     UserProject     UserProject[]
     UserLink        UserLink[]
 }
@@ -75,13 +74,14 @@ model UserPreferences {
 }
 
 model Organization {
-    id          String  @id @default(cuid())
+    id          String    @id @default(cuid())
     name        String
     description String?
     logo        String?
     url         String
     user        User[]
-    approved    Boolean @default(false)
+    approved    Boolean   @default(false)
+    Project     Project[]
 
     @@index([name])
 }
@@ -107,7 +107,7 @@ model Company {
     @@index([name])
 }
 
-model ProjectUpvote {
+model ProjectLike {
     id        String  @id @default(cuid())
     userId    String
     projectId String
@@ -128,18 +128,22 @@ model UserProject {
 }
 
 model Project {
-    id            String          @id @default(cuid())
-    name          String
-    description   String
-    githubUrl     String?
-    deploymentUrl String?
-    createdAt     DateTime        @default(now())
-    updatedAt     DateTime        @updatedAt
-    tags          Tag[]
-    userId        String?
-    ProjectUpvote ProjectUpvote[]
-    User          User?           @relation(fields: [userId], references: [id])
-    UserProject   UserProject[]
+    id             String        @id @default(cuid())
+    name           String
+    description    String
+    category       String
+    githubUrl      String?
+    deploymentUrl  String?
+    stars          Int?          @default(0)
+    forks          Int?          @default(0)
+    createdAt      DateTime      @default(now())
+    uploadedAt     DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt
+    organizationId String?
+    organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    tags           Tag[]
+    projectLike    ProjectLike[]
+    userProject    UserProject[]
 }
 
 model UserLink {
@@ -159,11 +163,10 @@ model LinkType {
 }
 
 model Tag {
-    id        String   @id @default(cuid())
-    name      String   @unique
-    color     String
-    project   Project? @relation(fields: [projectId], references: [id])
-    projectId String?
+    id       String    @id @default(cuid())
+    name     String    @unique
+    color    String
+    projects Project[]
 }
 
 model VerificationToken {

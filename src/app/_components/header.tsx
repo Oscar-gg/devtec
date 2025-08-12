@@ -5,6 +5,7 @@ import { signIn, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { Dropdown } from "./dropdown";
 import { ProfileIcon, LogoutIcon, GitHubIcon } from "./icons";
+import Link from "next/link";
 
 export const Header = () => {
   const [activeTab, setActiveTab] = useState<
@@ -18,12 +19,12 @@ export const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6]">
               <span className="text-lg font-bold text-white">D</span>
             </div>
             <h1 className="text-xl font-bold text-white">DevTec</h1>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-4">
             {/* Navigation Tabs */}

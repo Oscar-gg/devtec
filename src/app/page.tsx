@@ -1,26 +1,40 @@
+"use client";
 import { FilterBar } from "./trending/_components/filter-bar";
 import { LanguageChart } from "./trending/_components/language-chart";
 import { RepositoryGrid } from "./trending/_components/repository-grid";
+import { ProjectIcon } from "./_components/icons/project-icon";
+import { useSession } from "next-auth/react";
+import { Button } from "~/app/_components/button";
+import Link from "next/link";
 
-export default function TrendingPage() {
+export default function ProjectsPage() {
+  const session = useSession();
+
   return (
-    <div className="min-h-screen bg-[#121212] text-[#E0E0E0]">
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          {/* Language Distribution Chart */}
-          <div className="lg:col-span-1">
-            <FilterBar />
-            <div className="mt-6">
-              <LanguageChart />
-            </div>
-          </div>
-
-          {/* Repository Grid */}
-          <div className="lg:col-span-2">
-            <RepositoryGrid />
+    <main className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          {session.data && (
+            <Link href="/projects/create">
+              <Button className="mb-6 w-full">
+                <div className="flex flex-row items-center justify-center space-x-2">
+                  <ProjectIcon className="h-5 w-5" />
+                  <span>New Project</span>
+                </div>
+              </Button>
+            </Link>
+          )}
+          <FilterBar />
+          <div className="mt-6">
+            <LanguageChart />
           </div>
         </div>
-      </main>
-    </div>
+
+        {/* Repository Grid */}
+        <div className="lg:col-span-2">
+          <RepositoryGrid />
+        </div>
+      </div>
+    </main>
   );
 }

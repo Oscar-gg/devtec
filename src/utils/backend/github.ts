@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { PrismaClient } from "@prisma/client";
 
 const GitHubEmailSchema = z.object({
   email: z.string(),
@@ -22,4 +23,66 @@ export const getEmails = async (
   } else {
     throw new Error("Failed to fetch emails");
   }
+};
+
+const GitHubProjectSchema = z.object({
+  full_name: z.string(),
+  description: z.string(),
+  stargazers_count: z.number().optional(),
+  language: z.string().optional(),
+  forks_count: z.number().optional(),
+});
+
+export const getRepositoryData = async (
+  accessToken: string,
+  repoUrl: string,
+): Promise<z.infer<typeof GitHubProjectSchema>> => {
+  const ownerRepo = repoUrl.split("/").slice(-2);
+
+  if (ownerRepo.length !== 2) {
+    throw new Error("Invalid repository URL format");
+  }
+
+  const response = await fetch(
+    `https://api.github.com/repos/${ownerRepo[0]}/${ownerRepo[1]}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  if (response.ok) {
+    const projectData = GitHubProjectSchema.parse(await response.json());
+    return projectData;
+  } else {
+    if (response.status === 404) {
+      throw new Error("Repository not found");
+    }
+    throw new Error("Failed to fetch project data");
+  }
+};
+
+export const getGithubAccessToken = async (
+  userId: string,
+  db: PrismaClient,
+): Promise<string | null> => {
+  const userAccessToken = await db.user.findUnique({
+    where: { id: userId },
+    include: {
+      accounts: {
+        where: { provider: "github" },
+        select: { access_token: true },
+      },
+    },
+  });
+
+  if (
+    !userAccessToken ||
+    userAccessToken.accounts.length === 0 ||
+    !userAccessToken.accounts[0]?.access_token
+  ) {
+    return null;
+  }
+  return userAccessToken.accounts[0].access_token;
 };

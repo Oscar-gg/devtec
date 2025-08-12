@@ -6,6 +6,7 @@ import { Footer } from "./_components/footer";
 import { Header } from "./_components/header";
 import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from "next-auth/react";
+import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
   title: "DevTec - Browse Community Projects",
@@ -28,9 +29,12 @@ export default function RootLayout({
         <SessionProvider>
           <Header />
 
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <TRPCReactProvider>
+            <div className="min-h-screen text-[#E0E0E0]">{children}</div>
+          </TRPCReactProvider>
           <Footer />
         </SessionProvider>
+        <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
       </body>
     </html>
   );
