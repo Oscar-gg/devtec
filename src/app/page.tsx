@@ -1,7 +1,7 @@
 "use client";
 import { FilterBar } from "./trending/_components/filter-bar";
 import { LanguageChart } from "./trending/_components/language-chart";
-import { RepositoryGrid } from "./trending/_components/repository-grid";
+import { ProjectGrid } from "./trending/_components/project-grid";
 import { ProjectIcon } from "./_components/icons/project-icon";
 import { useSession } from "next-auth/react";
 import { Button } from "~/app/_components/button";
@@ -32,7 +32,7 @@ export default function ProjectsPage() {
 
         {/* Repository Grid */}
         <div className="lg:col-span-2">
-          <RepositoryGrid />
+          <ProjectGrid />
         </div>
       </div>
     </main>

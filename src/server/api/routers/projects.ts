@@ -189,4 +189,72 @@ export const projectsRouter = createTRPCRouter({
       });
       return count;
     }),
+
+  getProjectIds: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(20).default(5),
+        cursor: z.string().nullish(),
+        text: z.string().optional(),
+        category: z.string().optional(),
+        programmingLanguage: z.string().optional(),
+        sortBy: z.enum(["createdAt", "updatedAt", "stars"]).optional(),
+        order: z.enum(["asc", "desc"]).optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const projects = await ctx.db.project.findMany({
+        take: input.limit + 1, // get an extra item at the end which we'll use as next cursor
+        select: { id: true },
+        where: {
+          name: input.text
+            ? { contains: input.text, mode: "insensitive" }
+            : undefined,
+          description: input.text
+            ? { contains: input.text, mode: "insensitive" }
+            : undefined,
+          category: input.category
+            ? { equals: input.category, mode: "insensitive" }
+            : undefined,
+          programmingLanguage: input.programmingLanguage
+            ? { equals: input.programmingLanguage, mode: "insensitive" }
+            : undefined,
+        },
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+        orderBy: {
+          [input.sortBy ?? "updatedAt"]: input.order ?? "desc",
+        },
+      });
+      let nextCursor: typeof input.cursor | undefined = undefined;
+      if (projects.length > input.limit) {
+        const nextItem = projects.pop();
+        nextCursor = nextItem!.id;
+      }
+      return {
+        projects,
+        nextCursor,
+      };
+    }),
+
+  getProjectOverview: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const project = await ctx.db.project.findUnique({
+        where: { id: input.id },
+        include: {
+          tags: true,
+          _count: {
+            select: {
+              projectLike: true,
+            },
+          },
+        },
+      });
+
+      if (!project) {
+        throw new Error("Project not found");
+      }
+
+      return project;
+    }),
 });

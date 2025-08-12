@@ -63,10 +63,10 @@ Projects
 
 - [x] Complete README and contribution guide
 - [x] Improve denied auth page (non-domain users)
-- [ ] Show projects on homepage instead of mock data
+- [x] Show projects on homepage instead of mock data
+- [ ] Filter projects
 - [ ] Implement tags for projects
 - [ ] Update and Delete projects
-- [ ] Filter projects
 - [ ] Language distribution chart
 
 Developers
