@@ -5,7 +5,8 @@ import {
 } from "~/server/api/trpc";
 import { z } from "zod";
 import { ProjectSchema } from "~/utils/schemas/project";
-
+import { orderOptions, sortByOptions } from "~/utils/constants/filters";
+import { sortBySchema } from "~/utils/schemas/filters";
 export const projectsRouter = createTRPCRouter({
   createOrModifyProject: protectedProcedure
     .input(ProjectSchema)
@@ -194,32 +195,61 @@ export const projectsRouter = createTRPCRouter({
     .input(
       z.object({
         limit: z.number().min(1).max(20).default(5),
-        cursor: z.string().nullish(),
         text: z.string().optional(),
-        category: z.string().optional(),
-        programmingLanguage: z.string().optional(),
-        sortBy: z.enum(["createdAt", "updatedAt", "stars"]).optional(),
-        order: z.enum(["asc", "desc"]).optional(),
+        category: z.array(z.string()).optional(),
+        programmingLanguage: z.array(z.string()).optional(),
+        sortBy: sortBySchema,
+        tags: z.array(z.string()).optional(),
+        order: z.enum(orderOptions).optional(),
+        cursor: z.string().nullish(),
       }),
     )
     .query(async ({ ctx, input }) => {
+      const whereConditions: {
+        OR?: Array<{
+          name?: { contains: string; mode: "insensitive" };
+          description?: { contains: string; mode: "insensitive" };
+        }>;
+        category?: { in: string[] };
+        programmingLanguage?: { in: string[] };
+        tags?: {
+          some: {
+            name: { in: string[] };
+          };
+        };
+      } = {};
+
+      // Text search (search in both name and description)
+      if (input.text) {
+        whereConditions.OR = [
+          { name: { contains: input.text, mode: "insensitive" } },
+          { description: { contains: input.text, mode: "insensitive" } },
+        ];
+      }
+
+      if ((input?.category?.length ?? 0 > 0) && input?.category) {
+        whereConditions.category = { in: input.category };
+      }
+
+      if (
+        (input?.programmingLanguage?.length ?? 0 > 0) &&
+        input?.programmingLanguage
+      ) {
+        whereConditions.programmingLanguage = { in: input.programmingLanguage };
+      }
+
+      if ((input?.tags?.length ?? 0 > 0) && input?.tags) {
+        whereConditions.tags = {
+          some: {
+            name: { in: input.tags },
+          },
+        };
+      }
+
       const projects = await ctx.db.project.findMany({
         take: input.limit + 1, // get an extra item at the end which we'll use as next cursor
         select: { id: true },
-        where: {
-          name: input.text
-            ? { contains: input.text, mode: "insensitive" }
-            : undefined,
-          description: input.text
-            ? { contains: input.text, mode: "insensitive" }
-            : undefined,
-          category: input.category
-            ? { equals: input.category, mode: "insensitive" }
-            : undefined,
-          programmingLanguage: input.programmingLanguage
-            ? { equals: input.programmingLanguage, mode: "insensitive" }
-            : undefined,
-        },
+        where: whereConditions,
         cursor: input.cursor ? { id: input.cursor } : undefined,
         orderBy: {
           [input.sortBy ?? "updatedAt"]: input.order ?? "desc",

@@ -6,9 +6,19 @@ import { ProjectIcon } from "./_components/icons/project-icon";
 import { useSession } from "next-auth/react";
 import { Button } from "~/app/_components/button";
 import Link from "next/link";
+import { useState } from "react";
+import type { sortByOptions } from "~/utils/constants/filters";
 
 export default function ProjectsPage() {
   const session = useSession();
+
+  const [searchText, setSearchText] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>([]);
+  const [sortBy, setSortBy] =
+    useState<(typeof sortByOptions)[number]>("updatedAt");
+  const [order, setOrder] = useState<"asc" | "desc">("desc");
+  const [tags, setTags] = useState<string[]>([]);
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -24,7 +34,20 @@ export default function ProjectsPage() {
               </Button>
             </Link>
           )}
-          <FilterBar />
+          <FilterBar
+            languages={languages}
+            searchText={searchText}
+            categories={categories}
+            sortBy={sortBy}
+            order={order}
+            tags={tags}
+            setSearchText={setSearchText}
+            setCategories={setCategories}
+            setLanguages={setLanguages}
+            setSortBy={setSortBy}
+            setOrder={setOrder}
+            setTags={setTags}
+          />
           <div className="mt-6">
             <LanguageChart />
           </div>
@@ -32,7 +55,14 @@ export default function ProjectsPage() {
 
         {/* Repository Grid */}
         <div className="lg:col-span-2">
-          <ProjectGrid />
+          <ProjectGrid
+            searchText={searchText}
+            categories={categories}
+            languages={languages}
+            sortBy={sortBy}
+            order={order}
+            tags={tags}
+          />
         </div>
       </div>
     </main>

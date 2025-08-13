@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { GitHubIcon } from "~/app/_components/icons";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
+import { projectCategories, popularTags } from "~/utils/constants/tags";
 
 export default function CreateProjectPage() {
   interface FormData {
@@ -77,41 +78,6 @@ export default function CreateProjectPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Web Development");
-
-  const projectCategories = [
-    "Web Development",
-    "Mobile Development",
-    "Data Science",
-    "Machine Learning",
-    "DevOps",
-    "Game Development",
-    "Desktop Application",
-    "API/Backend",
-    "CLI",
-    "Robotics",
-    "Other",
-  ];
-
-  const popularTags = [
-    "React",
-    "Next.js",
-    "TypeScript",
-    "JavaScript",
-    "Python",
-    "Node.js",
-    "Express",
-    "MongoDB",
-    "PostgreSQL",
-    "Firebase",
-    "AWS",
-    "Docker",
-    "Machine Learning",
-    "AI",
-    "Flutter",
-    "React Native",
-    "Vue.js",
-    "Angular",
-  ];
 
   const handleInputChange = (field: string, value: string | null) => {
     if (value == "") value = null;

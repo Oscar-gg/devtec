@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "~/app/_components/button";
+import { Suspense } from "react";
 
 const errorMessages: Record<string, { title: string; description: string }> = {
   Configuration: {
@@ -62,7 +63,7 @@ const errorMessages: Record<string, { title: string; description: string }> = {
   },
 };
 
-export default function AuthErrorPage() {
+function AuthErrorPage() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error") ?? "Default";
 
@@ -130,5 +131,13 @@ export default function AuthErrorPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthErrorPageWrapper() {
+  return (
+    <Suspense>
+      <AuthErrorPage />
+    </Suspense>
   );
 }
