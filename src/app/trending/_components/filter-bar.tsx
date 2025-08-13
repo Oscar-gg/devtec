@@ -5,43 +5,65 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
 } from "@heroicons/react/24/outline";
-
+import { Button } from "~/app/_components/button";
 import { programmingLanguages } from "~/utils/constants/languages";
 import { sortByOptions } from "~/utils/constants/filters";
 import { SearchableDropdown } from "~/app/_components/searchable-dropdown";
 import { MultiSearchableDropdown } from "~/app/_components/multi-searchable-dropdown";
-import { projectCategories, defaultLanguage } from "~/utils/constants/tags";
+import { projectCategories } from "~/utils/constants/tags";
 import { formatSortByOptions } from "~/utils/constants/filters";
+import { useState } from "react";
+import { arraysEqual } from "~/utils/arrays";
+export interface Filter {
+  searchText: string;
+  categories: string[];
+  languages: string[];
+  sortBy: (typeof sortByOptions)[number];
+  order: "asc" | "desc";
+  tags: string[];
+}
 
-export function FilterBar({
-  languages,
+const filterModified = ({
+  filter,
   searchText,
   categories,
+  languages,
   sortBy,
   order,
   tags,
-  setSearchText,
-  setCategories,
-  setLanguages,
-  setSortBy,
-  setOrder,
-  setTags,
 }: {
-  languages: string[];
+  filter: Filter;
   searchText: string;
   categories: string[];
-  sortBy: string;
+  languages: string[];
+  sortBy: (typeof sortByOptions)[number];
   order: "asc" | "desc";
   tags: string[];
-  setSearchText: (text: string) => void;
-  setCategories: (categories: string[]) => void;
-  setLanguages: (languages: string[]) => void;
-  setSortBy: (sortBy: (typeof sortByOptions)[number]) => void;
-  setOrder: (order: "asc" | "desc") => void;
-  setTags: (tags: string[]) => void;
-}) {
-  const languageOptions = [defaultLanguage, ...programmingLanguages];
+}) => {
+  return (
+    !arraysEqual(filter.categories, categories) ||
+    !arraysEqual(filter.languages, languages) ||
+    filter.searchText !== searchText ||
+    filter.sortBy !== sortBy ||
+    filter.order !== order ||
+    !arraysEqual(filter.tags, tags)
+  );
+};
 
+export function FilterBar({
+  filter,
+  setFilter,
+}: {
+  filter: Filter;
+  setFilter: (filter: Filter) => void;
+}) {
+  const [searchText, setSearchText] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>([]);
+  const [sortBy, setSortBy] =
+    useState<(typeof sortByOptions)[number]>("updatedAt");
+  const [order, setOrder] = useState<"asc" | "desc">("desc");
+  const [tags, setTags] = useState<string[]>([]);
   return (
     <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
       <h2 className="mb-4 text-lg font-semibold text-[#E0E0E0]">
@@ -65,7 +87,7 @@ export function FilterBar({
       <div className="space-y-4">
         {/* Language Filter */}
         <MultiSearchableDropdown
-          options={languageOptions}
+          options={programmingLanguages}
           value={languages}
           onChange={setLanguages}
           placeholder="Search languages..."
@@ -95,6 +117,7 @@ export function FilterBar({
           label={
             <div className="flex flex-row items-center gap-x-2">
               <p>Sort by</p>
+              {/* Order Filter */}
               <div
                 className="rounded-lg p-1 hover:cursor-pointer hover:bg-[#2A2A2A]"
                 onClick={() => {
@@ -111,7 +134,33 @@ export function FilterBar({
           }
         />
 
-        {/* Order Filter */}
+        {filterModified({
+          filter,
+          categories,
+          languages,
+          searchText,
+          sortBy,
+          order,
+          tags,
+        }) && (
+          <div className="mt-4">
+            <Button
+              className="px-3 py-2 text-sm"
+              onClick={() => {
+                setFilter({
+                  searchText,
+                  categories,
+                  languages,
+                  sortBy,
+                  order,
+                  tags,
+                });
+              }}
+            >
+              Apply Filters
+            </Button>
+          </div>
+        )}
 
         {/* Results Count */}
         <div className="border-t border-gray-700 pt-4">
