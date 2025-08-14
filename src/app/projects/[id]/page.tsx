@@ -12,6 +12,7 @@ import {
   HeartIcon,
   UserIcon,
   ArrowPathIcon,
+  PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import { Button } from "~/app/_components/button";
@@ -22,6 +23,9 @@ import { defaultProfilePicture } from "~/utils/frontend/defaultProfilePicture";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 import { formatNumber } from "~/utils/frontend/number";
+import { getColorByLanguage } from "~/utils/constants/colors";
+import { cn } from "~/utils/frontend/classnames";
+import { getTagInfo } from "~/utils/constants/tags";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -31,6 +35,11 @@ export default function ProjectDetailPage() {
   const { data: project, isLoading } = api.projects.getProjectById.useQuery(
     { id: projectId },
     { enabled: !!projectId },
+  );
+
+  const { data: canEdit } = api.projects.canEditProject.useQuery(
+    { id: projectId },
+    { enabled: !!projectId && !!session.data?.user },
   );
 
   const upvote = api.projects.toggleUpvote.useMutation({
@@ -182,38 +191,47 @@ export default function ProjectDetailPage() {
             </div>
 
             {/* Action Buttons */}
-            {project.githubUrl && session.data?.user && (
-              <div className="mr-2 ml-auto flex items-center space-x-3">
+            {
+              <div className="flex items-center space-x-3">
+                {canEdit && (
+                  <Link href={`/projects/editor?id=${projectId}`}>
+                    <Button className="inline-flex h-9 items-center rounded-lg bg-[#8B5CF6] px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-[#7C3AED]">
+                      <PencilSquareIcon className="mr-2 h-4 w-4" />
+                      Edit Project
+                    </Button>
+                  </Link>
+                )}
+
+                {project.githubUrl && (
+                  <button
+                    onClick={() => {
+                      refreshGithubProject.mutate({ id: projectId });
+                    }}
+                    className={`inline-flex h-9 cursor-pointer items-center rounded-lg bg-[#1E1E1E] px-4 py-2 text-sm font-medium text-[#A0A0A0] transition-all duration-200 hover:bg-[#2A2A2A] hover:text-[#E0E0E0]`}
+                  >
+                    <ArrowPathIcon className="h-4 w-4" />
+                  </button>
+                )}
                 <button
+                  disabled={!session.data?.user}
                   onClick={() => {
-                    refreshGithubProject.mutate({ id: projectId });
+                    upvote.mutate({ id: projectId });
                   }}
-                  className={`inline-flex items-center rounded-lg bg-[#1E1E1E] px-4 py-2 text-sm font-medium text-[#A0A0A0] transition-all duration-200 hover:bg-[#2A2A2A] hover:text-[#E0E0E0]`}
+                  className={`inline-flex h-9 cursor-pointer items-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                    isLiked
+                      ? "bg-[#EF4444]/20 text-[#EF4444] hover:bg-[#EF4444]/30"
+                      : "bg-[#1E1E1E] text-[#A0A0A0] hover:bg-[#2A2A2A] hover:text-[#E0E0E0]"
+                  }`}
                 >
-                  <ArrowPathIcon className="h-4 w-4" />
+                  {isLiked ? (
+                    <HeartIconSolid className="mr-2 h-4 w-4" />
+                  ) : (
+                    <HeartIcon className="mr-2 h-4 w-4" />
+                  )}
+                  {formatNumber(likedCount)}
                 </button>
               </div>
-            )}
-            <div className="flex items-center space-x-3">
-              <button
-                disabled={!session.data?.user}
-                onClick={() => {
-                  upvote.mutate({ id: projectId });
-                }}
-                className={`inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                  isLiked
-                    ? "bg-[#EF4444]/20 text-[#EF4444] hover:bg-[#EF4444]/30"
-                    : "bg-[#1E1E1E] text-[#A0A0A0] hover:bg-[#2A2A2A] hover:text-[#E0E0E0]"
-                }`}
-              >
-                {isLiked ? (
-                  <HeartIconSolid className="mr-2 h-4 w-4" />
-                ) : (
-                  <HeartIcon className="mr-2 h-4 w-4" />
-                )}
-                {formatNumber(likedCount)}
-              </button>
-            </div>
+            }
           </div>
         </div>
 
@@ -225,8 +243,17 @@ export default function ProjectDetailPage() {
               <h2 className="mb-4 text-xl font-semibold text-[#E0E0E0]">
                 About this project
               </h2>
-              <p className="leading-relaxed text-[#A0A0A0]">
+              <p className="mb-4 leading-relaxed text-[#A0A0A0]">
                 {project.description}
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
+              <h2 className="mb-4 text-xl font-semibold text-[#E0E0E0]">
+                Category
+              </h2>
+              <p className="leading-relaxed text-[#A0A0A0]">
+                {project.category}
               </p>
             </div>
 
@@ -234,17 +261,26 @@ export default function ProjectDetailPage() {
             <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
               <h2 className="mb-4 flex items-center text-xl font-semibold text-[#E0E0E0]">
                 <TagIcon className="mr-2 h-5 w-5" />
-                Technologies Used
+                Tags
               </h2>
               <div className="flex flex-wrap gap-2">
-                {/* {project.tags.map((tag) => (
+                {project.tags.length === 0 && (
+                  <span className="inline-flex items-center rounded-full bg-[#8B5CF6]/20 px-3 py-1 text-sm font-medium text-[#8B5CF6]">
+                    No tags found
+                  </span>
+                )}
+                {project.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center rounded-full bg-[#8B5CF6]/20 px-3 py-1 text-sm font-medium text-[#8B5CF6]"
+                    title={getTagInfo(tag).explanation}
+                    className={cn(
+                      "inline-flex items-center rounded-full bg-[#8B5CF6]/20 px-3 py-1 text-sm font-medium text-[#8B5CF6]",
+                      getTagInfo(tag).color,
+                    )}
                   >
                     {tag}
                   </span>
-                ))} */}
+                ))}
               </div>
             </div>
 
@@ -254,6 +290,11 @@ export default function ProjectDetailPage() {
                 Project Links
               </h2>
               <div className="flex flex-wrap gap-4">
+                {!project.githubUrl && !project.deploymentUrl && (
+                  <span className="text-sm text-[#A0A0A0]">
+                    No links available for this project.
+                  </span>
+                )}
                 {project.githubUrl && (
                   <a
                     href={project.githubUrl}
@@ -288,15 +329,17 @@ export default function ProjectDetailPage() {
                 Project Stats
               </h3>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 text-[#A0A0A0]">
-                    <StarIcon className="h-4 w-4" />
-                    <span className="text-sm">Stars</span>
+                {typeof project.stars === "number" && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2 text-[#A0A0A0]">
+                      <StarIcon className="h-4 w-4" />
+                      <span className="text-sm">Stars</span>
+                    </div>
+                    <span className="font-medium text-[#E0E0E0]">
+                      {formatNumber(project.stars)}
+                    </span>
                   </div>
-                  <span className="font-medium text-[#E0E0E0]">
-                    {formatNumber(project.stars)}
-                  </span>
-                </div>
+                )}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 text-[#A0A0A0]">
                     <HeartIcon className="h-4 w-4" />
@@ -306,14 +349,59 @@ export default function ProjectDetailPage() {
                     {formatNumber(likedCount)}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 text-[#A0A0A0]">
-                    <CodeBracketIcon className="h-4 w-4" />
-                    <span className="text-sm">Forks</span>
+                {typeof project.forks === "number" && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2 text-[#A0A0A0]">
+                      <CodeBracketIcon className="h-4 w-4" />
+                      <span className="text-sm">Forks</span>
+                    </div>
+                    <span className="font-medium text-[#E0E0E0]">
+                      {formatNumber(project.forks)}
+                    </span>
                   </div>
-                  <span className="font-medium text-[#E0E0E0]">
-                    {formatNumber(project.forks)}
-                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Project Meta */}
+            <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
+              <h3 className="mb-4 text-lg font-semibold text-[#E0E0E0]">
+                Project Info
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-[#A0A0A0]">Language</p>
+                  <div className="flex items-center space-x-2">
+                    <div
+                      className="h-3 w-3 rounded-full"
+                      style={{
+                        backgroundColor: getColorByLanguage(
+                          project?.programmingLanguage,
+                        ),
+                      }}
+                    />
+                    <span className="text-sm text-[#E0E0E0]">
+                      {project?.programmingLanguage ?? "Unknown Language"}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#A0A0A0]">Category</p>
+                  <p className="text-sm text-[#E0E0E0]">{project.category}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#A0A0A0]">Created</p>
+                  <p className="text-sm text-[#E0E0E0]">
+                    {formatDate(project.createdAt)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#A0A0A0]">
+                    Last Updated
+                  </p>
+                  <p className="text-sm text-[#E0E0E0]">
+                    {formatDate(project.updatedAt)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -344,28 +432,6 @@ export default function ProjectDetailPage() {
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-            {/* Project Meta */}
-            <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
-              <h3 className="mb-4 text-lg font-semibold text-[#E0E0E0]">
-                Project Info
-              </h3>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-[#A0A0A0]">Created</p>
-                  <p className="text-sm text-[#E0E0E0]">
-                    {formatDate(project.createdAt)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#A0A0A0]">
-                    Last Updated
-                  </p>
-                  <p className="text-sm text-[#E0E0E0]">
-                    {formatDate(project.updatedAt)}
-                  </p>
-                </div>
               </div>
             </div>
           </div>

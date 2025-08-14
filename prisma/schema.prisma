@@ -137,12 +137,11 @@ model Project {
     stars               Int?          @default(0)
     forks               Int?          @default(0)
     createdAt           DateTime      @default(now())
-    uploadedAt          DateTime      @default(now())
     updatedAt           DateTime      @updatedAt
     organizationId      String?
     programmingLanguage String?
-    organization        Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-    tags                Tag[]
+    organization        Organization? @relation(fields: [organizationId], references: [id])
+    tags                String[]
     projectLike         ProjectLike[]
     userProject         UserProject[]
 }
@@ -163,17 +162,18 @@ model LinkType {
     UserLink UserLink[]
 }
 
-model Tag {
-    id       String    @id @default(cuid())
-    name     String    @unique
-    color    String
-    projects Project[]
-}
-
 model VerificationToken {
     identifier String
     token      String   @unique
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model StatsCache {
+    id            String   @id @default(cuid())
+    createdAt     DateTime @default(now())
+    totalProjects Int
+    languages     String[]
+    percentages   Float[]
 }

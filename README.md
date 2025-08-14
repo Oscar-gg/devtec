@@ -64,10 +64,12 @@ Projects
 - [x] Complete README and contribution guide
 - [x] Improve denied auth page (non-domain users)
 - [x] Show projects on homepage instead of mock data
-- [ ] Filter projects
-- [ ] Implement tags for projects
-- [ ] Update and Delete projects
-- [ ] Language distribution chart
+- [x] Filter projects
+- [x] Update and Delete projects
+- [x] Implement tags for projects
+- [x] Language distribution chart
+- [ ] Multiple authors per project
+- [ ] Select org for project
 
 Developers
 

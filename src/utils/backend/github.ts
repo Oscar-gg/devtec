@@ -27,16 +27,22 @@ export const getEmails = async (
 
 const GitHubProjectSchema = z.object({
   full_name: z.string(),
-  description: z.string(),
+  description: z.string().nullish(),
   stargazers_count: z.number().optional(),
   language: z.string().optional(),
   forks_count: z.number().optional(),
 });
 
-export const getRepositoryData = async (
-  accessToken: string,
-  repoUrl: string,
-): Promise<z.infer<typeof GitHubProjectSchema>> => {
+export const getRepositoryData = async ({
+  accessToken,
+  repoUrl,
+}: {
+  accessToken: string;
+  repoUrl: string;
+}): Promise<z.infer<typeof GitHubProjectSchema>> => {
+  if (repoUrl.endsWith("/")) {
+    repoUrl = repoUrl.slice(0, -1);
+  }
   const ownerRepo = repoUrl.split("/").slice(-2);
 
   if (ownerRepo.length !== 2) {

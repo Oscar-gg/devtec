@@ -20,7 +20,10 @@ export const githubRouter = createTRPCRouter({
         throw new Error("No GitHub access token found for the user.");
       }
 
-      return await getRepositoryData(userAccessToken, input.url);
+      return await getRepositoryData({
+        accessToken: userAccessToken,
+        repoUrl: input.url,
+      });
     }),
 
   // Only update star and fork counts
@@ -47,10 +50,10 @@ export const githubRouter = createTRPCRouter({
         throw new Error("No GitHub access token found for the user.");
       }
 
-      const projectData = await getRepositoryData(
-        userAccessToken,
-        project?.githubUrl,
-      );
+      const projectData = await getRepositoryData({
+        accessToken: userAccessToken,
+        repoUrl: project.githubUrl,
+      });
 
       return await ctx.db.project.update({
         where: { id: input.id },

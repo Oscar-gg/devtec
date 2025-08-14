@@ -10,7 +10,7 @@ import { programmingLanguages } from "~/utils/constants/languages";
 import { sortByOptions } from "~/utils/constants/filters";
 import { SearchableDropdown } from "~/app/_components/searchable-dropdown";
 import { MultiSearchableDropdown } from "~/app/_components/multi-searchable-dropdown";
-import { projectCategories } from "~/utils/constants/tags";
+import { projectCategories, tagNames } from "~/utils/constants/tags";
 import { formatSortByOptions } from "~/utils/constants/filters";
 import { useState } from "react";
 import { arraysEqual } from "~/utils/arrays";
@@ -103,6 +103,15 @@ export function FilterBar({
           label="Categories"
         />
 
+        {/* Tag Filter */}
+        <MultiSearchableDropdown
+          options={tagNames}
+          value={tags}
+          onChange={setTags}
+          placeholder="Search tags..."
+          label="Tags"
+        />
+
         {/* Sort Filter */}
         <SearchableDropdown
           formatOptions={formatSortByOptions}
@@ -161,13 +170,6 @@ export function FilterBar({
             </Button>
           </div>
         )}
-
-        {/* Results Count */}
-        <div className="border-t border-gray-700 pt-4">
-          <div className="text-sm text-[#A0A0A0]">
-            <span>1,234 repositories found</span>
-          </div>
-        </div>
       </div>
     </div>
   );

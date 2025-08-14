@@ -5,15 +5,42 @@ import {
 } from "~/server/api/trpc";
 import { z } from "zod";
 import { ProjectSchema } from "~/utils/schemas/project";
-import { orderOptions, sortByOptions } from "~/utils/constants/filters";
+import { orderOptions } from "~/utils/constants/filters";
 import { sortBySchema } from "~/utils/schemas/filters";
+import { type Prisma } from "@prisma/client";
+import {
+  getGithubAccessToken,
+  getRepositoryData,
+} from "~/utils/backend/github";
+import { defaultLanguage } from "~/utils/constants/tags";
+
 export const projectsRouter = createTRPCRouter({
   createOrModifyProject: protectedProcedure
     .input(ProjectSchema)
     .mutation(async ({ input, ctx }) => {
+      // Create a project
       if (!input.id) {
         if (!input.userIds.find((id) => id === ctx.session.user.id)) {
           input.userIds.push(ctx.session.user.id);
+        }
+
+        // Get github data if githubUrl is provided
+        let stars = null;
+        let forks = null;
+
+        if (input.githubUrl) {
+          const accessToken = await getGithubAccessToken(
+            ctx.session.user.id,
+            ctx.db,
+          );
+          if (accessToken) {
+            const githubData = await getRepositoryData({
+              accessToken: accessToken,
+              repoUrl: input.githubUrl,
+            });
+            stars = githubData.stargazers_count;
+            forks = githubData.forks_count;
+          }
         }
 
         const project = await ctx.db.project.create({
@@ -23,12 +50,10 @@ export const projectsRouter = createTRPCRouter({
             category: input.category,
             githubUrl: input.githubUrl,
             deploymentUrl: input.deploymentUrl,
-            // tags: {
-            //   connectOrCreate: input.tags.map((tag) => ({
-            //     where: { name: tag.name },
-            //     create: { name: tag.name, color: tag.color },
-            //   })),
-            // },
+            programmingLanguage: input.programmingLanguage,
+            tags: input.tags,
+            forks: forks,
+            stars: stars,
           },
         });
 
@@ -46,6 +71,7 @@ export const projectsRouter = createTRPCRouter({
           },
         });
       } else {
+        // Update a project
         const project = await ctx.db.project.findUnique({
           where: { id: input.id },
           include: { userProject: true },
@@ -61,6 +87,38 @@ export const projectsRouter = createTRPCRouter({
           throw new Error("You do not have permission to modify this project");
         }
 
+        if (!input.userIds.find((id) => id === ctx.session.user.id)) {
+          input.userIds.push(ctx.session.user.id);
+        }
+
+        // Remove existing user associations
+        await ctx.db.userProject.deleteMany({
+          where: { projectId: input.id },
+        });
+
+        let stars = null;
+        let forks = null;
+
+        if (input.githubUrl) {
+          const accessToken = await getGithubAccessToken(
+            ctx.session.user.id,
+            ctx.db,
+          );
+          try {
+            if (accessToken) {
+              const githubData = await getRepositoryData({
+                accessToken: accessToken,
+                repoUrl: input.githubUrl,
+              });
+
+              stars = githubData.stargazers_count;
+              forks = githubData.forks_count;
+            }
+          } catch (error) {
+            console.error("Error fetching GitHub data:", error);
+          }
+        }
+
         return await ctx.db.project.update({
           where: { id: input.id },
           data: {
@@ -69,12 +127,18 @@ export const projectsRouter = createTRPCRouter({
             category: input.category,
             githubUrl: input.githubUrl,
             deploymentUrl: input.deploymentUrl,
-            // tags: {
-            //   connectOrCreate: input.tags.map((tag) => ({
-            //     where: { name: tag.name },
-            //     create: { name: tag.name, color: tag.color },
-            //   })),
-            // },
+            programmingLanguage: input.programmingLanguage,
+            tags: input.tags,
+            forks: forks,
+            stars: stars,
+            userProject: {
+              connectOrCreate: input.userIds.map((id) => ({
+                where: {
+                  userId_projectId: { userId: id, projectId: project.id },
+                },
+                create: { userId: id },
+              })),
+            },
           },
         });
       }
@@ -97,7 +161,6 @@ export const projectsRouter = createTRPCRouter({
               },
             },
           },
-          tags: true,
         },
       });
 
@@ -205,19 +268,7 @@ export const projectsRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const whereConditions: {
-        OR?: Array<{
-          name?: { contains: string; mode: "insensitive" };
-          description?: { contains: string; mode: "insensitive" };
-        }>;
-        category?: { in: string[] };
-        programmingLanguage?: { in: string[] };
-        tags?: {
-          some: {
-            name: { in: string[] };
-          };
-        };
-      } = {};
+      const whereConditions: Prisma.ProjectWhereInput = {};
 
       // Text search (search in both name and description)
       if (input.text) {
@@ -240,9 +291,7 @@ export const projectsRouter = createTRPCRouter({
 
       if ((input?.tags?.length ?? 0 > 0) && input?.tags) {
         whereConditions.tags = {
-          some: {
-            name: { in: input.tags },
-          },
+          hasSome: input.tags,
         };
       }
 
@@ -272,7 +321,6 @@ export const projectsRouter = createTRPCRouter({
       const project = await ctx.db.project.findUnique({
         where: { id: input.id },
         include: {
-          tags: true,
           _count: {
             select: {
               projectLike: true,
@@ -287,4 +335,83 @@ export const projectsRouter = createTRPCRouter({
 
       return project;
     }),
+
+  deleteProject: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.db.project.delete({
+        where: { id: input.id },
+      });
+    }),
+
+  getStats: publicProcedure.query(async ({ ctx }) => {
+    const now = new Date();
+
+    const lastStats = await ctx.db.statsCache.findFirst({
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Refresh once a day
+    if (
+      !lastStats ||
+      lastStats.createdAt < new Date(now.getTime() - 24 * 60 * 60 * 1000)
+    ) {
+      const allProjects = await ctx.db.project.findMany({
+        select: { programmingLanguage: true },
+      });
+
+      const totalProjects = allProjects.length;
+
+      if (totalProjects === 0) {
+        return null;
+      }
+
+      // Calculate programming language statistics
+      const languageCount: Record<string, number> = {};
+
+      for (const project of allProjects) {
+        if (project.programmingLanguage) {
+          languageCount[project.programmingLanguage] =
+            (languageCount[project.programmingLanguage] ?? 0) + 1;
+        }
+      }
+
+      // Sort languages by usage and get top k (k=6)
+      const sortedLanguages = Object.entries(languageCount)
+        .filter((lang) => lang[0] !== defaultLanguage)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 6);
+
+      const topLanguages = sortedLanguages.map(([lang]) => lang);
+      const topPercentages = sortedLanguages.map(
+        ([, count]) => Math.round((count / totalProjects) * 100 * 100) / 100,
+      );
+
+      const consideredLanguages = sortedLanguages.reduce(
+        (acc, [, count]) => acc + count,
+        0,
+      );
+
+      // add Other to topLanguages
+      if (consideredLanguages < totalProjects) {
+        topLanguages.push(defaultLanguage);
+        topPercentages.push(
+          Math.round(
+            ((totalProjects - consideredLanguages) / totalProjects) * 100 * 100,
+          ) / 100,
+        );
+      }
+
+      // Save stats to cache
+      return await ctx.db.statsCache.create({
+        data: {
+          languages: topLanguages,
+          percentages: topPercentages,
+          totalProjects: totalProjects,
+        },
+      });
+    } else {
+      return lastStats;
+    }
+  }),
 });

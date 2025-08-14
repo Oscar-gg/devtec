@@ -1,23 +1,17 @@
 "use client";
+import { api } from "~/trpc/react";
+import { getColorByLanguage } from "~/utils/constants/colors";
 
 export function LanguageChart() {
-  const languageData = [
-    { name: "JavaScript", percentage: 28, color: "#F7DF1E" },
-    { name: "Python", percentage: 22, color: "#3776AB" },
-    { name: "TypeScript", percentage: 18, color: "#3178C6" },
-    { name: "Java", percentage: 12, color: "#ED8B00" },
-    { name: "Go", percentage: 8, color: "#00ADD8" },
-    { name: "Rust", percentage: 6, color: "#CE422B" },
-    { name: "Other", percentage: 6, color: "#A0A0A0" },
-  ];
+  const { data: languageStats, isLoading } = api.projects.getStats.useQuery();
 
   // Calculate cumulative percentages for the conic gradient
   let cumulative = 0;
-  const gradientStops = languageData
-    .map((lang) => {
+  const gradientStops = languageStats?.languages
+    .map((lang, index) => {
       const start = cumulative;
-      cumulative += lang.percentage;
-      return `${lang.color} ${start}% ${cumulative}%`;
+      cumulative += languageStats?.percentages[index] ?? 0;
+      return `${getColorByLanguage(lang)} ${start}% ${cumulative}%`;
     })
     .join(", ");
 
@@ -28,49 +22,65 @@ export function LanguageChart() {
       </h2>
 
       <div className="flex flex-col items-center">
-        {/* Pie Chart */}
-        <div className="relative mb-6 h-48 w-48">
-          <div
-            className="h-full w-full rounded-full"
-            style={{
-              background: `conic-gradient(${gradientStops})`,
-            }}
-          />
-          <div className="absolute inset-4 flex items-center justify-center rounded-full bg-[#1E1E1E]">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-[#E0E0E0]">1,234</div>
-              <div className="text-sm text-[#A0A0A0]">Repositories</div>
-            </div>
+        {isLoading ? (
+          <div className="w-full animate-pulse">
+            <div className="mx-auto mb-6 h-48 w-48 rounded-full bg-[#121212]"></div>
+            <div className="mb-3 h-7 w-full rounded bg-[#121212]"></div>
+            <div className="mb-3 h-7 w-full rounded bg-[#121212]"></div>
+            <div className="mb-3 h-7 w-full rounded bg-[#121212]"></div>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Pie Chart */}
+            <div className="relative mb-6 h-48 w-48">
+              <div
+                className="h-full w-full rounded-full"
+                style={{
+                  background: `conic-gradient(${gradientStops})`,
+                }}
+              />
+              <div className="absolute inset-4 flex items-center justify-center rounded-full bg-[#1E1E1E]">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#E0E0E0]">
+                    {languageStats?.totalProjects}
+                  </div>
+                  <div className="text-sm text-[#A0A0A0]">
+                    Project{languageStats?.totalProjects !== 1 ? "s" : ""}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        {/* Legend */}
-        <div className="w-full space-y-3">
-          {languageData.map((lang) => (
-            <div key={lang.name} className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div
-                  className="h-3 w-3 rounded-full"
-                  style={{ backgroundColor: lang.color }}
-                />
-                <span className="text-sm font-medium text-[#E0E0E0]">
-                  {lang.name}
+            {/* Legend */}
+            <div className="w-full space-y-3">
+              {languageStats?.languages.map((lang, index) => (
+                <div key={lang} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div
+                      className="h-3 w-3 rounded-full"
+                      style={{ backgroundColor: getColorByLanguage(lang) }}
+                    />
+                    <span className="text-sm font-medium text-[#E0E0E0]">
+                      {lang}
+                    </span>
+                  </div>
+                  <span className="text-sm text-[#A0A0A0]">
+                    {languageStats?.percentages[index]}%
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Results Count */}
+            <div className="mt-6 w-full border-t border-gray-700 pt-2">
+              <div className="text-sm text-[#A0A0A0]">
+                <span>
+                  Last updated: {languageStats?.createdAt.toUTCString()}
                 </span>
               </div>
-              <span className="text-sm text-[#A0A0A0]">{lang.percentage}%</span>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Trending Languages Badge */}
-      <div className="mt-6 rounded-lg border border-gray-700 bg-[#121212] p-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-[#A0A0A0]">Trending this week</span>
-          <span className="inline-flex items-center rounded-full bg-[#F59E0B]/20 px-2 py-1 text-xs font-medium text-[#F59E0B]">
-            Rust +12%
-          </span>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

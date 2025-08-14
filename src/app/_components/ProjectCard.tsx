@@ -11,20 +11,60 @@ import { formatNumber } from "~/utils/frontend/number";
 import { getColorByLanguage } from "~/utils/constants/colors";
 import { ForkIcon } from "./icons";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
-export const ProjectCard = ({ projectId }: { projectId: string }) => {
+export const ProjectCard = ({
+  projectId,
+  position,
+  setMaxVisibleProject,
+}: {
+  projectId: string;
+  position?: number;
+  setMaxVisibleProject?: (num: number) => void;
+}) => {
   const { data: project, isLoading } = api.projects.getProjectOverview.useQuery(
     {
       id: projectId,
     },
   );
 
+  const elementRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (isLoading || position === undefined) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting && position !== undefined) {
+          setMaxVisibleProject?.(position);
+        }
+      },
+      { threshold: 0.1 }, // 10% visible
+    );
+
+    const currentElement = elementRef.current;
+    if (currentElement) {
+      observer.observe(currentElement);
+    }
+
+    return () => {
+      if (currentElement) {
+        observer.unobserve(currentElement);
+      }
+    };
+  }, [position, setMaxVisibleProject, isLoading]);
+
   if (isLoading) {
     return <ProjectCardSkeleton />;
   }
 
   return (
-    <div className="group rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200 hover:border-[#8B5CF6]/50 hover:shadow-lg hover:shadow-[#8B5CF6]/10">
+    <div
+      ref={elementRef}
+      className="group rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200 hover:border-[#8B5CF6]/50 hover:shadow-lg hover:shadow-[#8B5CF6]/10"
+    >
       <Link className="cursor-pointer" href={`/projects/${projectId}`}>
         {/* Repository Header */}
         <div className="mb-4 flex items-start justify-between">
@@ -110,7 +150,7 @@ export const ProjectCard = ({ projectId }: { projectId: string }) => {
   );
 };
 
-const ProjectCardSkeleton = () => {
+export const ProjectCardSkeleton = () => {
   return (
     <div className="animate-pulse rounded-xl border border-gray-800 bg-[#1E1E1E] p-6">
       {/* Repository Header Skeleton */}
