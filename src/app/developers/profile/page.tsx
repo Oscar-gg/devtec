@@ -4,17 +4,17 @@ import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { api } from "~/trpc/react";
-import { Button } from "../_components/button";
+import { Button } from "../../_components/button";
 import { Suspense } from "react";
 
 import {
   ProfileEditModal,
+  ProfileCard,
   WorkExperienceSection,
   OrganizationsSection,
   ProjectsSection,
   LinksSection,
 } from "./_components";
-import { ProfileCard } from "../developers/profile/_components";
 
 function ProfilePage() {
   const searchParams = useSearchParams();

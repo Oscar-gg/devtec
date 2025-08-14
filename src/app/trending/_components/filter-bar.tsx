@@ -1,10 +1,5 @@
 "use client";
 
-import {
-  MagnifyingGlassIcon,
-  ArrowUpIcon,
-  ArrowDownIcon,
-} from "@heroicons/react/24/outline";
 import { Button } from "~/app/_components/button";
 import { programmingLanguages } from "~/utils/constants/languages";
 import { sortByOptions } from "~/utils/constants/filters";
@@ -14,6 +9,9 @@ import { projectCategories, tagNames } from "~/utils/constants/tags";
 import { formatSortByOptions } from "~/utils/constants/filters";
 import { useState } from "react";
 import { arraysEqual } from "~/utils/arrays";
+import { SearchBar } from "~/app/_components/searchbar";
+import { OrderButton } from "~/app/_components/order";
+
 export interface Filter {
   searchText: string;
   categories: string[];
@@ -72,16 +70,11 @@ export function FilterBar({
 
       {/* Search Bar */}
       <div className="mb-4">
-        <div className="relative">
-          <MagnifyingGlassIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-[#A0A0A0]" />
-          <input
-            type="text"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search repositories..."
-            className="w-full rounded-lg border border-gray-700 bg-[#121212] py-2 pr-4 pl-10 text-[#E0E0E0] placeholder-[#A0A0A0] transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-[#8B5CF6] focus:outline-none"
-          />
-        </div>
+        <SearchBar
+          searchText={searchText}
+          setSearchText={setSearchText}
+          placeholder="Search repositories..."
+        />
       </div>
 
       <div className="space-y-4">
@@ -127,18 +120,7 @@ export function FilterBar({
             <div className="flex flex-row items-center gap-x-2">
               <p>Sort by</p>
               {/* Order Filter */}
-              <div
-                className="rounded-lg p-1 hover:cursor-pointer hover:bg-[#2A2A2A]"
-                onClick={() => {
-                  setOrder(order === "asc" ? "desc" : "asc");
-                }}
-              >
-                {order === "asc" ? (
-                  <ArrowUpIcon className="h-4 w-4 font-bold text-[#A0A0A0]" />
-                ) : (
-                  <ArrowDownIcon className="h-4 w-4 font-bold text-[#A0A0A0]" />
-                )}
-              </div>
+              <OrderButton order={order} setOrder={setOrder} />
             </div>
           }
         />

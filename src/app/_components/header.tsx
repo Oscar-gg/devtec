@@ -8,14 +8,25 @@ import { ProfileIcon, LogoutIcon, GitHubIcon } from "./icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { profilePicture } from "~/utils/frontend/defaultProfilePicture";
+import { useSection } from "../_hooks/section";
+
+const sectionRoutes: Record<string, string> = {
+  projects: "/",
+  developers: "/developers",
+  organizations: "/organizations",
+};
 
 export const Header = () => {
-  const [activeTab, setActiveTab] = useState<
-    "projects" | "developers" | "organizations"
-  >("projects");
-
   const session = useSession();
   const router = useRouter();
+
+  const { activeSection } = useSection();
+
+  const navigateToSection = (section: string) => {
+    if (sectionRoutes[section] && activeSection !== sectionRoutes[section]) {
+      router.push(sectionRoutes[section]);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-800 bg-[#1E1E1E]">
@@ -33,9 +44,9 @@ export const Header = () => {
             {/* Navigation Tabs */}
             <div className="flex rounded-lg bg-[#121212] p-1">
               <button
-                onClick={() => setActiveTab("projects")}
+                onClick={() => navigateToSection("projects")}
                 className={`rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                  activeTab === "projects"
+                  activeSection === "projects"
                     ? "bg-[#8B5CF6] text-white shadow-lg"
                     : "text-[#A0A0A0] hover:bg-[#1E1E1E] hover:text-[#E0E0E0]"
                 }`}
@@ -43,9 +54,9 @@ export const Header = () => {
                 Projects
               </button>
               <button
-                onClick={() => setActiveTab("developers")}
+                onClick={() => navigateToSection("developers")}
                 className={`rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                  activeTab === "developers"
+                  activeSection === "developers"
                     ? "bg-[#8B5CF6] text-white shadow-lg"
                     : "text-[#A0A0A0] hover:bg-[#1E1E1E] hover:text-[#E0E0E0]"
                 }`}
@@ -53,9 +64,9 @@ export const Header = () => {
                 Developers
               </button>
               <button
-                onClick={() => setActiveTab("organizations")}
+                onClick={() => navigateToSection("organizations")}
                 className={`rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                  activeTab === "organizations"
+                  activeSection === "organizations"
                     ? "bg-[#8B5CF6] text-white shadow-lg"
                     : "text-[#A0A0A0] hover:bg-[#1E1E1E] hover:text-[#E0E0E0]"
                 }`}
@@ -84,7 +95,7 @@ export const Header = () => {
                     label: "Profile",
                     icon: <ProfileIcon />,
                     onClick: () => {
-                      router.push(`/profile`);
+                      router.push(`/developers/profile`);
                     },
                   },
                   {
