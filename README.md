@@ -73,8 +73,8 @@ Projects
 
 Developers
 
+- [x] Profile config page / read and update user info
 - [ ] Developers page
-- [ ] Profile config page / read and update user info
 
 Organizations
 

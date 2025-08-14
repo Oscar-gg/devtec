@@ -1,5 +1,5 @@
 import { api } from "~/trpc/react";
-
+import { cn } from "~/utils/frontend/classnames";
 import {
   StarIcon,
   EyeIcon,
@@ -17,9 +17,13 @@ export const ProjectCard = ({
   projectId,
   position,
   setMaxVisibleProject,
+  diableLinks = false,
+  className,
 }: {
   projectId: string;
   position?: number;
+  diableLinks?: boolean;
+  className?: string;
   setMaxVisibleProject?: (num: number) => void;
 }) => {
   const { data: project, isLoading } = api.projects.getProjectOverview.useQuery(
@@ -57,13 +61,16 @@ export const ProjectCard = ({
   }, [position, setMaxVisibleProject, isLoading]);
 
   if (isLoading) {
-    return <ProjectCardSkeleton />;
+    return <ProjectCardSkeleton diableLinks={diableLinks} />;
   }
 
   return (
     <div
       ref={elementRef}
-      className="group rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200 hover:border-[#8B5CF6]/50 hover:shadow-lg hover:shadow-[#8B5CF6]/10"
+      className={cn(
+        "group rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200 hover:border-[#8B5CF6]/50 hover:shadow-lg hover:shadow-[#8B5CF6]/10",
+        className,
+      )}
     >
       <Link className="cursor-pointer" href={`/projects/${projectId}`}>
         {/* Repository Header */}
@@ -123,34 +130,40 @@ export const ProjectCard = ({
         </Link>
 
         {/* Action Buttons */}
-        <div className="flex items-center space-x-3">
-          {project?.deploymentUrl && (
-            <a
-              href={project?.deploymentUrl}
-              target="_blank"
-              className="inline-flex items-center rounded-lg bg-[#3B82F6]/20 px-3 py-1 text-sm font-medium text-[#3B82F6] transition-all duration-200 hover:bg-[#3B82F6]/30 hover:shadow-lg hover:shadow-[#3B82F6]/20"
-            >
-              <ArrowTopRightOnSquareIcon className="mr-1 h-4 w-4" />
-              Deployment
-            </a>
-          )}
-          {project?.githubUrl && (
-            <a
-              href={project?.githubUrl}
-              target="_blank"
-              className="inline-flex items-center rounded-lg bg-[#10B981]/20 px-3 py-1 text-sm font-medium text-[#10B981] transition-all duration-200 hover:bg-[#10B981]/30 hover:shadow-lg hover:shadow-[#10B981]/20"
-            >
-              <EyeIcon className="mr-1 h-4 w-4" />
-              Visit GitHub
-            </a>
-          )}
-        </div>
+        {!diableLinks && (
+          <div className="flex items-center space-x-3">
+            {project?.deploymentUrl && (
+              <a
+                href={project?.deploymentUrl}
+                target="_blank"
+                className="inline-flex items-center rounded-lg bg-[#3B82F6]/20 px-3 py-1 text-sm font-medium text-[#3B82F6] transition-all duration-200 hover:bg-[#3B82F6]/30 hover:shadow-lg hover:shadow-[#3B82F6]/20"
+              >
+                <ArrowTopRightOnSquareIcon className="mr-1 h-4 w-4" />
+                Deployment
+              </a>
+            )}
+            {project?.githubUrl && (
+              <a
+                href={project?.githubUrl}
+                target="_blank"
+                className="inline-flex items-center rounded-lg bg-[#10B981]/20 px-3 py-1 text-sm font-medium text-[#10B981] transition-all duration-200 hover:bg-[#10B981]/30 hover:shadow-lg hover:shadow-[#10B981]/20"
+              >
+                <EyeIcon className="mr-1 h-4 w-4" />
+                Visit GitHub
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export const ProjectCardSkeleton = () => {
+export const ProjectCardSkeleton = ({
+  diableLinks,
+}: {
+  diableLinks?: boolean;
+}) => {
   return (
     <div className="animate-pulse rounded-xl border border-gray-800 bg-[#1E1E1E] p-6">
       {/* Repository Header Skeleton */}
@@ -189,10 +202,12 @@ export const ProjectCardSkeleton = () => {
         </div>
 
         {/* Action Buttons Skeleton */}
-        <div className="flex items-center space-x-3">
-          <div className="h-8 w-24 rounded-lg bg-gray-700"></div>
-          <div className="h-8 w-28 rounded-lg bg-gray-700"></div>
-        </div>
+        {!diableLinks && (
+          <div className="flex items-center space-x-3">
+            <div className="h-8 w-24 rounded-lg bg-gray-700"></div>
+            <div className="h-8 w-28 rounded-lg bg-gray-700"></div>
+          </div>
+        )}
       </div>
     </div>
   );

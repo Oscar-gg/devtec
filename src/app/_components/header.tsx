@@ -6,6 +6,8 @@ import { useSession } from "next-auth/react";
 import { Dropdown } from "./dropdown";
 import { ProfileIcon, LogoutIcon, GitHubIcon } from "./icons";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { profilePicture } from "~/utils/frontend/defaultProfilePicture";
 
 export const Header = () => {
   const [activeTab, setActiveTab] = useState<
@@ -13,6 +15,7 @@ export const Header = () => {
   >("projects");
 
   const session = useSession();
+  const router = useRouter();
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-800 bg-[#1E1E1E]">
@@ -67,7 +70,10 @@ export const Header = () => {
                   <div className="rounded-full focus:ring-2 focus:ring-[#8B5CF6] focus:ring-offset-2 focus:ring-offset-[#1E1E1E] focus:outline-none">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={session.data?.user?.image ?? "/default-avatar.png"}
+                      src={profilePicture({
+                        image: session.data?.user?.image,
+                        name: session.data?.user?.name,
+                      })}
                       alt="User Avatar"
                       className="h-10 w-10 rounded-full border border-gray-600 object-cover transition-colors duration-200 hover:border-[#8B5CF6]"
                     />
@@ -78,8 +84,7 @@ export const Header = () => {
                     label: "Profile",
                     icon: <ProfileIcon />,
                     onClick: () => {
-                      // Navigate to profile - you can implement this later
-                      console.log("Navigate to profile");
+                      router.push(`/profile`);
                     },
                   },
                   {

@@ -48,8 +48,9 @@ model User {
     email           String?          @unique
     schoolEmail     String?          @unique
     emailVerified   DateTime?
+    createdAt       DateTime?        @default(now())
     image           String?
-    profileImage    String?
+    originalImage   String?
     accounts        Account[]
     sessions        Session[]
     workExperience  WorkExperience[]

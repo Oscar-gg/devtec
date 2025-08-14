@@ -170,8 +170,7 @@ export default function ProjectDetailPage() {
                       <>
                         <img
                           src={
-                            author?.profileImage ??
-                            defaultProfilePicture(author?.name)
+                            author?.image ?? defaultProfilePicture(author?.name)
                           }
                           alt={author?.name ?? "No author"}
                           className="h-4 w-4 rounded-full"
@@ -418,7 +417,7 @@ export default function ProjectDetailPage() {
                     <div className="h-10 w-10 overflow-hidden rounded-full bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6]">
                       <img
                         src={
-                          userProject.user.profileImage ??
+                          userProject.user.image ??
                           defaultProfilePicture(userProject.user.name)
                         }
                         alt={userProject.user.name ?? "User"}

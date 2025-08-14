@@ -156,7 +156,7 @@ export const projectsRouter = createTRPCRouter({
                 select: {
                   id: true,
                   name: true,
-                  profileImage: true,
+                  image: true,
                 },
               },
             },

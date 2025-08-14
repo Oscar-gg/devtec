@@ -73,7 +73,13 @@ export const authConfig = {
 
         for (const email of associatedEmails) {
           if (email.verified && email.email.endsWith(`@${allowedDomain}`)) {
-            user.email = email.email; // Save tec email
+            if (user.id) {
+              await db.user.update({
+                where: { id: user.id },
+                data: { schoolEmail: email.email, originalImage: user.image },
+              });
+            }
+
             return true;
           }
         }
