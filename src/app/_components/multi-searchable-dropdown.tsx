@@ -11,6 +11,8 @@ interface MultiSearchableDropdownProps {
   options: string[];
   value: string[];
   onChange: (value: string[]) => void;
+  formatOptions?: (value: string) => string;
+
   placeholder?: string;
   label?: string;
   className?: string;
@@ -25,15 +27,19 @@ export function MultiSearchableDropdown({
   label,
   className = "",
   maxDisplayItems = 3,
+  formatOptions,
 }: MultiSearchableDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filter options based on search query
-  const filteredOptions = options.filter((option) =>
-    option.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredOptions = options.filter((option) => {
+    if (!formatOptions)
+      return option.toLowerCase().includes(searchQuery.toLowerCase());
+    return formatOptions(option)
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+  });
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -89,7 +95,7 @@ export function MultiSearchableDropdown({
             key={item}
             className="inline-flex items-center gap-1 rounded-md bg-[#8B5CF6] px-2 py-1 text-xs text-white"
           >
-            {item}
+            {formatOptions ? formatOptions(item) : item}
             <button
               type="button"
               onClick={(e) => handleRemoveItem(item, e)}
@@ -180,7 +186,9 @@ export function MultiSearchableDropdown({
                           : "text-[#E0E0E0]"
                       }`}
                     >
-                      <span>{option}</span>
+                      <span>
+                        {formatOptions ? formatOptions(option) : option}
+                      </span>
                       {isSelected && (
                         <button
                           type="button"

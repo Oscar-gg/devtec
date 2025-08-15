@@ -64,6 +64,12 @@ export const authConfig = {
 
       // Check if primary email has the allowed domain
       if (profile?.email?.endsWith(`@${allowedDomain}`)) {
+        if (user.id) {
+          await db.user.update({
+            where: { id: user.id },
+            data: { schoolEmail: profile.email, originalImage: user.image },
+          });
+        }
         return true;
       }
 

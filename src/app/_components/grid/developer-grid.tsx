@@ -8,6 +8,9 @@ import {
   ProfileCardSkeleton,
 } from "~/app/developers/profile/_components";
 
+import { Button } from "../button";
+import Link from "next/link";
+
 export function DeveloperGrid({
   searchText,
   order,
@@ -23,7 +26,7 @@ export function DeveloperGrid({
     isFetchingNextPage,
   } = api.user.getUserIds.useInfiniteQuery(
     {
-      limit: 3,
+      limit: 5,
       text: searchText,
       order: order,
     },
@@ -42,16 +45,16 @@ export function DeveloperGrid({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {allUsers.map((user) => (
           <ProfileWrapper key={user.id} userId={user.id} />
         ))}
+        {(isLoading || isFetchingNextPage) && (
+          <ProfileCardSkeleton hideOrganizations hideEmails />
+        )}
       </div>
-      {(isLoading || isFetchingNextPage) && (
-        <ProfileCardSkeleton hideOrganizations hideEmails />
-      )}
       {!isLoading && (
-        <div className="group rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200">
+        <div className="group flex flex-col justify-center rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200">
           {allUsers.length === 0 && (
             <p className="text-center text-gray-400">No users found.</p>
           )}
@@ -59,6 +62,15 @@ export function DeveloperGrid({
             <p className="text-center text-gray-400">
               No additional users found.
             </p>
+          )}
+          {hasNextPage && (
+            <Button
+              className="mx-auto"
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+            >
+              Load More Developers
+            </Button>
           )}
         </div>
       )}
@@ -76,6 +88,8 @@ const ProfileWrapper = ({ userId }: { userId: string }) => {
   }
 
   return (
-    <ProfileCard profile={profile} hideOrganizations isOwnProfile={false} />
+    <Link href={`/developers/profile?id=${userId}`}>
+      <ProfileCard profile={profile} hideOrganizations isOwnProfile={false} />
+    </Link>
   );
 };

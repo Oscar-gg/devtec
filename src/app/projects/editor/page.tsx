@@ -28,12 +28,36 @@ interface FormData {
   tags: string[];
 }
 
+export const formatUserName = ({
+  userId,
+  userMap,
+}: {
+  userId: string;
+  userMap: Record<string, string> | undefined | null;
+}) => {
+  return userMap?.[userId] ?? userId;
+};
+
 function CreateProjectPage() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
   const { data: existingProject, isLoading: isLoadingExistingProject } =
     api.projects.getProjectById.useQuery({ id: id ?? "" }, { enabled: !!id });
+
+  const { data: userNames, isLoading: loadingUserNames } =
+    api.user.getUserNames.useQuery();
+
+  const userMap: Record<string, string> = {};
+
+  if (userNames) {
+    for (const user of userNames) {
+      if (user.name) {
+        const email = user.email ? " | " + user.email : "";
+        userMap[user.id] = user.name + email;
+      }
+    }
+  }
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -219,6 +243,7 @@ function CreateProjectPage() {
                 <div className="h-32 rounded-xl bg-[#1E1E1E]"></div>
                 <div className="h-48 rounded-xl bg-[#1E1E1E]"></div>
                 <div className="h-32 rounded-xl bg-[#1E1E1E]"></div>
+                <div className="h-32 rounded-xl bg-[#1E1E1E]"></div>
                 <div className="flex flex-row justify-end gap-x-6">
                   <div className="mb-6 h-10 w-32 rounded bg-[#1E1E1E]"></div>
                   <div className="mb-6 h-10 w-32 rounded bg-[#1E1E1E]"></div>
@@ -393,6 +418,54 @@ function CreateProjectPage() {
                         <button
                           type="button"
                           onClick={() => removeTag(tag)}
+                          className="ml-2 hover:text-gray-300 focus:outline-none"
+                        >
+                          <XMarkIcon className="h-3 w-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Authors Section */}
+            <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
+              <h2 className="mb-6 text-xl font-semibold text-[#E0E0E0]">
+                Authors
+              </h2>
+
+              {loadingUserNames ? (
+                <div>Loading...</div>
+              ) : (
+                <MultiSearchableDropdown
+                  options={userNames?.map((user) => user.id) ?? []}
+                  value={formData.userOwners}
+                  formatOptions={(userId) =>
+                    formatUserName({ userId, userMap })
+                  }
+                  onChange={(value) => handleInputChange("userOwners", value)}
+                  placeholder="Search developers..."
+                  className="mb-4"
+                />
+              )}
+
+              {/* Selected Authors */}
+              {formData.userOwners.length > 0 && (
+                <div>
+                  <p className="mb-3 text-sm font-medium text-[#A0A0A0]">
+                    Selected Authors:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.userOwners.map((user) => (
+                      <span
+                        key={user}
+                        className="inline-flex items-center rounded-full bg-[#8B5CF6] px-3 py-1 text-xs font-medium text-white"
+                      >
+                        {formatUserName({ userId: user, userMap })}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(user)}
                           className="ml-2 hover:text-gray-300 focus:outline-none"
                         >
                           <XMarkIcon className="h-3 w-3" />

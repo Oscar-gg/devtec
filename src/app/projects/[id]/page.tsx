@@ -408,7 +408,7 @@ export default function ProjectDetailPage() {
               <h3 className="mb-4 text-lg font-semibold text-[#E0E0E0]">
                 Author{project.userProject.length > 1 ? "s" : ""}
               </h3>
-              <div className="flex items-center space-x-3">
+              <div className="mx-2 flex flex-col items-start space-y-4">
                 {project.userProject.map((userProject) => (
                   <div
                     key={userProject.id}

@@ -68,13 +68,16 @@ Projects
 - [x] Update and Delete projects
 - [x] Implement tags for projects
 - [x] Language distribution chart
-- [ ] Multiple authors per project
+- [x] Multiple authors per project
 - [ ] Select org for project
 
 Developers
 
 - [x] Profile config page / read and update user info
-- [ ] Developers page
+- [x] Developers page
+- [ ] Developer Links
+- [ ] Developer Work experience
+- [ ] Developer Organizations
 
 Organizations
 

@@ -218,4 +218,27 @@ export const userRouter = createTRPCRouter({
         nextCursor,
       };
     }),
+
+  getUserNames: protectedProcedure.query(async ({ ctx }) => {
+    const users = await ctx.db.user.findMany({
+      include: {
+        userPreferences: {
+          select: {
+            showEmail: true,
+            showSchoolEmail: true,
+          },
+        },
+      },
+    });
+
+    return users.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.userPreferences?.showEmail
+        ? user.email
+        : user.userPreferences?.showSchoolEmail
+          ? user.schoolEmail
+          : null,
+    }));
+  }),
 });
