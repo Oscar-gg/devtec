@@ -6,7 +6,7 @@ import type { z } from "zod";
 import {
   ProjectCard,
   ProjectCardSkeleton,
-} from "~/app/_components/ProjectCard";
+} from "~/app/_components/card/ProjectCard";
 import type { sortBySchema } from "~/utils/schemas/filters";
 import { useRef, useCallback } from "react";
 

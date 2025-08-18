@@ -56,8 +56,8 @@ For more information, see [Contributing Guidelines](CONTRIBUTING.md) before inve
 
 Deployment
 
-- [ ] Set up db for deploy
-- [ ] Set up env vars for github auth in deploy
+- [x] Set up db for deploy
+- [x] Set up env vars for github auth in deploy
 
 Projects
 
@@ -81,4 +81,5 @@ Developers
 
 Organizations
 
-- [ ] Crud Organizations
+- [x] Create Organization
+- [x] Organization page read

@@ -7,14 +7,12 @@ import { api } from "~/trpc/react";
 import { Button } from "../../_components/button";
 import { Suspense } from "react";
 
-import {
-  ProfileEditModal,
-  ProfileCard,
-  WorkExperienceSection,
-  OrganizationsSection,
-  ProjectsSection,
-  LinksSection,
-} from "./_components";
+import { ProfileEditModal } from "./_components/ProfileEditModal";
+import { ProfileCard } from "~/app/_components/card/ProfileCard";
+import { WorkExperienceSection } from "./_components/WorkExperienceSection";
+import { OrganizationsSection } from "./_components/OrganizationsSection";
+import { ProjectsSection } from "./_components/ProjectsSection";
+import { LinksSection } from "./_components/LinksSection";
 
 function ProfilePage() {
   const searchParams = useSearchParams();
@@ -126,6 +124,16 @@ function ProfilePage() {
 
           {/* Right Column - Detailed Information */}
           <div className="space-y-8 lg:col-span-2">
+            <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
+              <h2 className="mb-4 text-xl font-semibold text-[#E0E0E0]">
+                About
+              </h2>
+              <p className="leading-relaxed text-[#A0A0A0]">
+                {(publicProfileQuery.userPreferences?.about?.length ?? 0) > 0
+                  ? publicProfileQuery.userPreferences?.about
+                  : "No information provided."}
+              </p>
+            </div>
             {/* Links */}
             {publicProfileQuery.UserLink &&
               publicProfileQuery.UserLink.length > 0 && (
@@ -152,7 +160,9 @@ function ProfilePage() {
             {publicProfileQuery.UserProject &&
               publicProfileQuery.UserProject.length > 0 && (
                 <ProjectsSection
-                  userProjects={publicProfileQuery.UserProject}
+                  projects={publicProfileQuery.UserProject.map(
+                    ({ project }) => ({ id: project.id }),
+                  )}
                 />
               )}
 

@@ -123,6 +123,7 @@ export const userRouter = createTRPCRouter({
         showWorkExperience: z.boolean().optional(),
         showOrganizations: z.boolean().optional(),
         showRelatedProjects: z.boolean().optional(),
+        about: z.string().max(1000).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -198,6 +199,9 @@ export const userRouter = createTRPCRouter({
           { name: { contains: input.text, mode: "insensitive" } },
         ];
       }
+      whereConditions.userPreferences = {
+        showProfile: true,
+      };
 
       const users = await ctx.db.user.findMany({
         take: input.limit + 1, // get an extra item at the end which we'll use as next cursor

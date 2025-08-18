@@ -28,7 +28,7 @@ interface FormData {
   tags: string[];
 }
 
-export const formatUserName = ({
+const formatUserName = ({
   userId,
   userMap,
 }: {
@@ -189,6 +189,13 @@ function CreateProjectPage() {
     setFormData((prev) => ({
       ...prev,
       tags: prev.tags.filter((tag) => tag !== tagToRemove),
+    }));
+  };
+
+  const removeUser = (userIdToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      userOwners: prev.userOwners.filter((userId) => userId !== userIdToRemove),
     }));
   };
 
@@ -465,7 +472,7 @@ function CreateProjectPage() {
                         {formatUserName({ userId: user, userMap })}
                         <button
                           type="button"
-                          onClick={() => removeTag(user)}
+                          onClick={() => removeUser(user)}
                           className="ml-2 hover:text-gray-300 focus:outline-none"
                         >
                           <XMarkIcon className="h-3 w-3" />

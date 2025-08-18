@@ -13,6 +13,7 @@ interface ProfileEditModalProps {
 
 export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
   const [preferences, setPreferences] = useState({
+    about: profile.userPreferences?.about ?? "",
     showGenericImage: profile.userPreferences?.showGenericImage ?? false,
     showEmail: profile.userPreferences?.showEmail ?? false,
     showSchoolEmail: profile.userPreferences?.showSchoolEmail ?? false,
@@ -76,6 +77,28 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* General Settings */}
+          <div>
+            <h3 className="mb-4 text-lg font-semibold text-white">
+              General Settings
+            </h3>
+            <label
+              htmlFor="about"
+              className="mb-2 block text-sm font-medium text-[#A0A0A0]"
+            >
+              About you
+            </label>
+            <input
+              type="text"
+              id="about"
+              value={preferences.about}
+              onChange={(e) =>
+                setPreferences((prev) => ({ ...prev, about: e.target.value }))
+              }
+              placeholder="I'm very passionate about..."
+              className="w-full rounded-lg border border-gray-700 bg-[#121212] px-4 py-3 text-[#E0E0E0] placeholder-[#A0A0A0] transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-[#8B5CF6] focus:outline-none"
+            />
+          </div>
           {/* Privacy Settings */}
           <div>
             <h3 className="mb-4 text-lg font-semibold text-white">

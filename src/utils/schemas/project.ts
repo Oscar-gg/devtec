@@ -12,3 +12,11 @@ export const ProjectSchema = z.object({
   tags: z.array(z.string().min(1).max(50)),
   userIds: z.array(z.string()),
 });
+
+export const OrganizationSchema = z.object({
+  id: z.string().nullish(),
+  name: z.string().min(1).max(100),
+  description: z.string().min(1).max(350),
+  url: z.string().url(),
+  userIds: z.array(z.string()),
+});

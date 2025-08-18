@@ -339,6 +339,19 @@ export const projectsRouter = createTRPCRouter({
   deleteProject: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      const project = await ctx.db.project.findUnique({
+        where: {
+          id: input.id,
+          userProject: { some: { userId: ctx.session.user.id } },
+        },
+      });
+
+      if (!project) {
+        throw new Error(
+          "Project not found or you do not have permission to delete it",
+        );
+      }
+
       return await ctx.db.project.delete({
         where: { id: input.id },
       });

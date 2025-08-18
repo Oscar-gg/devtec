@@ -6,7 +6,7 @@ import { useRef } from "react";
 import {
   ProfileCard,
   ProfileCardSkeleton,
-} from "~/app/developers/profile/_components";
+} from "~/app/_components/card/ProfileCard";
 
 import { Button } from "../button";
 import Link from "next/link";
@@ -78,7 +78,13 @@ export function DeveloperGrid({
   );
 }
 
-const ProfileWrapper = ({ userId }: { userId: string }) => {
+export const ProfileWrapper = ({
+  userId,
+  className,
+}: {
+  userId: string;
+  className?: string;
+}) => {
   const { data: profile, isLoading } = api.user.getUserOverview.useQuery({
     userId,
   });
@@ -89,7 +95,12 @@ const ProfileWrapper = ({ userId }: { userId: string }) => {
 
   return (
     <Link href={`/developers/profile?id=${userId}`}>
-      <ProfileCard profile={profile} hideOrganizations isOwnProfile={false} />
+      <ProfileCard
+        className={className}
+        profile={profile}
+        hideOrganizations
+        isOwnProfile={false}
+      />
     </Link>
   );
 };

@@ -1,4 +1,5 @@
 import { type RouterOutputs } from "~/trpc/react";
+import { cn } from "~/utils/frontend/classnames";
 import { profilePicture } from "~/utils/frontend/defaultProfilePicture";
 
 interface ProfileCardProps {
@@ -8,16 +9,23 @@ interface ProfileCardProps {
   isOwnProfile: boolean;
   projectCount?: number;
   hideOrganizations?: boolean;
+  className?: string;
 }
 
 export function ProfileCard({
+  className,
   profile,
   isOwnProfile,
   projectCount,
   hideOrganizations = false,
 }: ProfileCardProps) {
   return (
-    <div className="rounded-lg border border-gray-700 bg-[#1E1E1E] p-6">
+    <div
+      className={cn(
+        "rounded-lg border border-gray-700 bg-[#1E1E1E] p-6",
+        className,
+      )}
+    >
       {/* Profile Image */}
       <div className="mb-6 flex justify-center">
         <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-[#8B5CF6]">

@@ -65,6 +65,7 @@ model UserPreferences {
     id                  String  @id @default(cuid())
     userId              String  @unique
     user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    about               String?
     showGenericImage    Boolean @default(false)
     showEmail           Boolean @default(false)
     showSchoolEmail     Boolean @default(false)
@@ -81,8 +82,8 @@ model Organization {
     logo        String?
     url         String
     user        User[]
-    approved    Boolean   @default(false)
     Project     Project[]
+    createdAt   DateTime  @default(now())
 
     @@index([name])
 }

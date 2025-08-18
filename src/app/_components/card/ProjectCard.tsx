@@ -9,7 +9,7 @@ import {
 
 import { formatNumber } from "~/utils/frontend/number";
 import { getColorByLanguage } from "~/utils/constants/colors";
-import { ForkIcon } from "./icons";
+import { ForkIcon } from "../icons";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 

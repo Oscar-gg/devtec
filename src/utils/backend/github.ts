@@ -69,6 +69,39 @@ export const getRepositoryData = async ({
   }
 };
 
+const GitHubOrganizationSchema = z.object({
+  name: z.string(),
+  description: z.string().nullish(),
+  avatar_url: z.string().url().nullish(),
+});
+
+export const getOrganizationData = async ({
+  orgUrl,
+}: {
+  orgUrl: string;
+}): Promise<z.infer<typeof GitHubOrganizationSchema>> => {
+  if (orgUrl.endsWith("/")) {
+    orgUrl = orgUrl.slice(0, -1);
+  }
+  const org = orgUrl.split("/").slice(-1);
+
+  if (org.length !== 1) {
+    throw new Error("Invalid organization URL format");
+  }
+
+  const response = await fetch(`https://api.github.com/orgs/${org[0]}`, {});
+
+  if (response.ok) {
+    return GitHubOrganizationSchema.parse(await response.json());
+  } else {
+    if (response.status === 404) {
+      throw new Error("Organization not found");
+    }
+
+    throw new Error("Failed to fetch organization data");
+  }
+};
+
 export const getGithubAccessToken = async (
   userId: string,
   db: PrismaClient,
