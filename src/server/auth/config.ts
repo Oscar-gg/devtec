@@ -58,6 +58,18 @@ export const authConfig = {
      */
   ],
   adapter: PrismaAdapter(db),
+  events: {
+    createUser: async ({ user }) => {
+      // Init preferences for new users
+      if (user.id) {
+        await db.userPreferences.create({
+          data: {
+            userId: user.id,
+          },
+        });
+      }
+    },
+  },
   callbacks: {
     async signIn({ profile, account, user }) {
       const allowedDomain = "tec.mx";
