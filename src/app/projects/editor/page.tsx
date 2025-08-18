@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "~/app/_components/button";
 import { ProjectIcon } from "~/app/_components/icons/project-icon";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+
+import { ArrowLeftIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 import { GitHubIcon } from "~/app/_components/icons";
 import { api } from "~/trpc/react";
@@ -13,9 +14,10 @@ import { useSearchParams } from "next/navigation";
 import { defaultLanguage, defaultCategory } from "~/utils/constants/tags";
 import { SearchableDropdown } from "~/app/_components/searchable-dropdown";
 import { Suspense } from "react";
-
+import { defaultOrganization } from "~/utils/constants/organizations";
 import { programmingLanguages } from "~/utils/constants/languages";
 import { MultiSearchableDropdown } from "~/app/_components/multi-searchable-dropdown";
+import Link from "next/link";
 
 interface FormData {
   name: string;
@@ -26,16 +28,17 @@ interface FormData {
   programmingLanguage: string;
   userOwners: string[];
   tags: string[];
+  organization: string;
 }
 
-const formatUserName = ({
-  userId,
-  userMap,
+const formatId = ({
+  id,
+  labelMap,
 }: {
-  userId: string;
-  userMap: Record<string, string> | undefined | null;
+  id: string;
+  labelMap: Record<string, string> | undefined | null;
 }) => {
-  return userMap?.[userId] ?? userId;
+  return labelMap?.[id] ?? id;
 };
 
 function CreateProjectPage() {
@@ -48,13 +51,25 @@ function CreateProjectPage() {
   const { data: userNames, isLoading: loadingUserNames } =
     api.user.getUserNames.useQuery();
 
+  const { data: organizationNames, isLoading: loadingOrganizationNames } =
+    api.organizations.getOrganizationNames.useQuery();
+
   const userMap: Record<string, string> = {};
+  const organizationMap: Record<string, string> = {};
 
   if (userNames) {
     for (const user of userNames) {
       if (user.name) {
         const email = user.email ? " | " + user.email : "";
         userMap[user.id] = user.name + email;
+      }
+    }
+  }
+
+  if (organizationNames) {
+    for (const org of organizationNames) {
+      if (org.name) {
+        organizationMap[org.id] = org.name;
       }
     }
   }
@@ -68,6 +83,7 @@ function CreateProjectPage() {
     programmingLanguage: defaultLanguage,
     tags: [],
     userOwners: [],
+    organization: defaultOrganization,
   });
 
   const utils = api.useUtils();
@@ -136,6 +152,7 @@ function CreateProjectPage() {
           existingProject?.programmingLanguage ?? defaultLanguage,
         tags: existingProject?.tags ?? [],
         userOwners: existingProject?.userProject.map((up) => up.userId) ?? [],
+        organization: existingProject?.organizationId ?? defaultOrganization,
       });
     }
   }, [existingProject, id]);
@@ -211,6 +228,7 @@ function CreateProjectPage() {
       name: formData.name,
       userIds: formData.userOwners,
       tags: formData.tags,
+      organizationId: formData.organization,
     });
   };
 
@@ -219,8 +237,17 @@ function CreateProjectPage() {
       <div className="mx-auto max-w-3xl">
         {/* Header */}
         <div className="mb-8">
+          <div className="mb-6">
+            <Link
+              href={id ? "/projects/" + id : "/"}
+              className="inline-flex items-center text-[#A0A0A0] transition-colors duration-200 hover:text-[#E0E0E0]"
+            >
+              <ArrowLeftIcon className="mr-2 h-4 w-4" />
+              Back to Project{id ? "" : "s"}
+            </Link>
+          </div>
           <div className="mb-4 flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6]">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6]">
               <ProjectIcon className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -405,13 +432,12 @@ function CreateProjectPage() {
                 value={formData.tags}
                 onChange={(value) => handleInputChange("tags", value)}
                 placeholder="Search tags..."
-                className="mb-4"
                 maxDisplayItems={3}
               />
 
               {/* Selected Tags */}
               {formData.tags.length > 0 && (
-                <div>
+                <div className="mt-4">
                   <p className="mb-3 text-sm font-medium text-[#A0A0A0]">
                     Selected Tags:
                   </p>
@@ -449,17 +475,16 @@ function CreateProjectPage() {
                   options={userNames?.map((user) => user.id) ?? []}
                   value={formData.userOwners}
                   formatOptions={(userId) =>
-                    formatUserName({ userId, userMap })
+                    formatId({ id: userId, labelMap: userMap })
                   }
                   onChange={(value) => handleInputChange("userOwners", value)}
                   placeholder="Search developers..."
-                  className="mb-4"
                 />
               )}
 
               {/* Selected Authors */}
               {formData.userOwners.length > 0 && (
-                <div>
+                <div className="mt-4">
                   <p className="mb-3 text-sm font-medium text-[#A0A0A0]">
                     Selected Authors:
                   </p>
@@ -469,7 +494,7 @@ function CreateProjectPage() {
                         key={user}
                         className="inline-flex items-center rounded-full bg-[#8B5CF6] px-3 py-1 text-xs font-medium text-white"
                       >
-                        {formatUserName({ userId: user, userMap })}
+                        {formatId({ id: user, labelMap: userMap })}
                         <button
                           type="button"
                           onClick={() => removeUser(user)}
@@ -481,6 +506,28 @@ function CreateProjectPage() {
                     ))}
                   </div>
                 </div>
+              )}
+            </div>
+
+            {/* Organization Section */}
+            <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
+              <h2 className="mb-6 text-xl font-semibold text-[#E0E0E0]">
+                Organization
+              </h2>
+
+              {loadingOrganizationNames ? (
+                <div>Loading...</div>
+              ) : (
+                <SearchableDropdown
+                  options={[defaultOrganization].concat(
+                    organizationNames?.map((org) => org.id) ?? [],
+                  )}
+                  value={formData.organization}
+                  formatOptions={(id) =>
+                    formatId({ id, labelMap: organizationMap })
+                  }
+                  onChange={(value) => handleInputChange("organization", value)}
+                />
               )}
             </div>
 

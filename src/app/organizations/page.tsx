@@ -6,7 +6,7 @@ import { OrderButton } from "~/app/_components/order";
 import { Button } from "../_components/button";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { ProjectIcon } from "../_components/icons/project-icon";
+import { OrganizationIcon } from "../_components/icons";
 import { cn } from "~/utils/frontend/classnames";
 
 interface Filter {
@@ -29,7 +29,7 @@ export default function DevelopersPage() {
             <Link href="/organizations/editor">
               <Button className="h-10 w-full py-2">
                 <div className="flex flex-row items-center justify-center space-x-2">
-                  <ProjectIcon className="h-5 w-5" />
+                  <OrganizationIcon className="h-5 w-5" />
                   <span>New Organization</span>
                 </div>
               </Button>

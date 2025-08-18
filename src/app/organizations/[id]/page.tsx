@@ -1,18 +1,14 @@
 "use client";
 
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
 import { Button } from "~/app/_components/button";
 import { Suspense } from "react";
 import { useRouter } from "next/navigation";
-
+import { SummarizedCard } from "~/app/_components/card/SummarizedCard";
 import { OrganizationCard } from "~/app/_components/card/OrganizationCard";
 import { ProjectsSection } from "~/app/developers/profile/_components/ProjectsSection";
-import {
-  DeveloperGrid,
-  ProfileWrapper,
-} from "~/app/_components/grid/developer-grid";
 
 function OrganizationPage() {
   const params = useParams();
@@ -128,6 +124,25 @@ function OrganizationPage() {
                   : "No information provided."}
               </p>
             </div>
+
+            {/* Users in Organization */}
+            <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
+              <h2 className="mb-4 text-xl font-semibold text-[#E0E0E0]">
+                Members
+              </h2>
+              <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+                {organizationData.user.length > 0 &&
+                  organizationData.user.map((user) => (
+                    <SummarizedCard
+                      key={user.id}
+                      image={user.image}
+                      name={user.name}
+                      url={`/developers/profile?id=${user.id}`}
+                      className="rounded-lg border border-gray-600 bg-[#2A2A2A] p-3 transition-colors hover:bg-[#333333]"
+                    />
+                  ))}
+              </div>
+            </div>
             {/* Related Projects */}
             {organizationData.Project &&
               organizationData.Project.length > 0 && (
@@ -135,24 +150,6 @@ function OrganizationPage() {
                   projects={organizationData.Project.map(({ id }) => ({ id }))}
                 />
               )}
-            {/* Users in Organization */}
-            <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
-              <h2 className="mb-4 text-xl font-semibold text-[#E0E0E0]">
-                Users
-              </h2>
-              {organizationData.user.length > 0 &&
-                organizationData.user.map((user) => (
-                  <div
-                    key={user.id}
-                    className="grid grid-cols-1 gap-6 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2"
-                  >
-                    <ProfileWrapper
-                      className="group rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200 hover:border-[#8B5CF6]/50 hover:shadow-lg hover:shadow-[#8B5CF6]/10"
-                      userId={user.id}
-                    />
-                  </div>
-                ))}
-            </div>
           </div>
         </div>
       </div>

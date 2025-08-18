@@ -279,4 +279,13 @@ export const organizationsRouter = createTRPCRouter({
         },
       });
     }),
+
+  getOrganizationNames: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.organization.findMany({
+      select: {
+        name: true,
+        id: true,
+      },
+    });
+  }),
 });

@@ -26,6 +26,7 @@ import { formatNumber } from "~/utils/frontend/number";
 import { getColorByLanguage } from "~/utils/constants/colors";
 import { cn } from "~/utils/frontend/classnames";
 import { getTagInfo } from "~/utils/constants/tags";
+import { SummarizedCard } from "~/app/_components/card/SummarizedCard";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -404,32 +405,34 @@ export default function ProjectDetailPage() {
                 </div>
               </div>
             </div>
+            {project.organization && (
+              <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
+                <h3 className="mb-4 text-lg font-semibold text-[#E0E0E0]">
+                  Organization
+                </h3>
+                <div className="mx-2 flex flex-col items-start space-y-4">
+                  <SummarizedCard
+                    name={project.organization.name}
+                    image={project.organization.logo}
+                    placeholder="Organization"
+                    url={"/organizations/" + project.organization.id}
+                  />
+                </div>
+              </div>
+            )}
             <div className="rounded-xl bg-[#1E1E1E] p-6 shadow-lg">
               <h3 className="mb-4 text-lg font-semibold text-[#E0E0E0]">
                 Author{project.userProject.length > 1 ? "s" : ""}
               </h3>
               <div className="mx-2 flex flex-col items-start space-y-4">
                 {project.userProject.map((userProject) => (
-                  <div
-                    key={userProject.id}
-                    className="flex items-center space-x-3"
-                  >
-                    <div className="h-10 w-10 overflow-hidden rounded-full bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6]">
-                      <img
-                        src={
-                          userProject.user.image ??
-                          defaultProfilePicture(userProject.user.name)
-                        }
-                        alt={userProject.user.name ?? "User"}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#E0E0E0]">
-                        {userProject.user.name}
-                      </p>
-                    </div>
-                  </div>
+                  <SummarizedCard
+                    key={userProject.user.id}
+                    name={userProject.user.name}
+                    image={userProject.user.image}
+                    placeholder="User"
+                    url={"/developers/profile?id=" + userProject.user.id}
+                  />
                 ))}
               </div>
             </div>

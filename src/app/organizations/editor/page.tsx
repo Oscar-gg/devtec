@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "~/app/_components/button";
-import { ProjectIcon } from "~/app/_components/icons/project-icon";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { OrganizationIcon } from "~/app/_components/icons";
+
+import { ArrowLeftIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
@@ -11,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 import { MultiSearchableDropdown } from "~/app/_components/multi-searchable-dropdown";
+import Link from "next/link";
 
 interface FormData {
   name: string;
@@ -171,9 +173,18 @@ function CreateOrganizationPage() {
       <div className="mx-auto max-w-3xl">
         {/* Header */}
         <div className="mb-8">
+          <div className="mb-6">
+            <Link
+              href={id ? "/organizations/" + id : "/organizations"}
+              className="inline-flex items-center text-[#A0A0A0] transition-colors duration-200 hover:text-[#E0E0E0]"
+            >
+              <ArrowLeftIcon className="mr-2 h-4 w-4" />
+              Back to Organization{id ? "" : "s"}
+            </Link>
+          </div>
           <div className="mb-4 flex items-center space-x-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6]">
-              <ProjectIcon className="h-6 w-6 text-white" />
+              <OrganizationIcon className="h-6 w-6 text-white" />
             </div>
             <div>
               <h1 className="text-3xl font-bold text-[#E0E0E0]">
@@ -339,7 +350,7 @@ function CreateOrganizationPage() {
                 disabled={!formData.name || !formData.description}
               >
                 <div className="flex items-center space-x-2">
-                  <ProjectIcon className="h-5 w-5" />
+                  <OrganizationIcon className="h-5 w-5" />
                   <span>
                     {existingOrganization || id
                       ? "Save"

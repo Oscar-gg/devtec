@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { signIn, signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { Dropdown } from "./dropdown";

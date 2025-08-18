@@ -11,6 +11,7 @@ export const ProjectSchema = z.object({
   createdAt: z.date().nullish(),
   tags: z.array(z.string().min(1).max(50)),
   userIds: z.array(z.string()),
+  organizationId: z.string().nullish(),
 });
 
 export const OrganizationSchema = z.object({

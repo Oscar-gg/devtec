@@ -54,7 +54,7 @@ export function DeveloperGrid({
         )}
       </div>
       {!isLoading && (
-        <div className="group flex flex-col justify-center rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200">
+        <div className="flex flex-col justify-center rounded-xl border border-gray-800 bg-[#1E1E1E] p-6 transition-all duration-200">
           {allUsers.length === 0 && (
             <p className="text-center text-gray-400">No users found.</p>
           )}

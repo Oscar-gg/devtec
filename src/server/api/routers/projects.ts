@@ -13,11 +13,17 @@ import {
   getRepositoryData,
 } from "~/utils/backend/github";
 import { defaultLanguage } from "~/utils/constants/tags";
+import { defaultOrganization } from "~/utils/constants/organizations";
 
 export const projectsRouter = createTRPCRouter({
   createOrModifyProject: protectedProcedure
     .input(ProjectSchema)
     .mutation(async ({ input, ctx }) => {
+      // If the default organization is selected, set it to null
+      if (input.organizationId === defaultOrganization) {
+        input.organizationId = null;
+      }
+
       // Create a project
       if (!input.id) {
         if (!input.userIds.find((id) => id === ctx.session.user.id)) {
@@ -54,6 +60,13 @@ export const projectsRouter = createTRPCRouter({
             tags: input.tags,
             forks: forks,
             stars: stars,
+            ...(input.organizationId && {
+              organization: {
+                connect: {
+                  id: input.organizationId,
+                },
+              },
+            }),
           },
         });
 
@@ -131,6 +144,22 @@ export const projectsRouter = createTRPCRouter({
             tags: input.tags,
             forks: forks,
             stars: stars,
+            ...(input.organizationId && {
+              organization: {
+                connect: {
+                  id: input.organizationId,
+                },
+              },
+            }),
+            // Disconnect the previous organization
+            ...(!input.organizationId &&
+              project.organizationId && {
+                organization: {
+                  disconnect: {
+                    id: project.organizationId,
+                  },
+                },
+              }),
             userProject: {
               connectOrCreate: input.userIds.map((id) => ({
                 where: {
@@ -159,6 +188,13 @@ export const projectsRouter = createTRPCRouter({
                   image: true,
                 },
               },
+            },
+          },
+          organization: {
+            select: {
+              id: true,
+              name: true,
+              logo: true,
             },
           },
         },

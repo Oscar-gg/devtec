@@ -69,17 +69,22 @@ Projects
 - [x] Implement tags for projects
 - [x] Language distribution chart
 - [x] Multiple authors per project
-- [ ] Select org for project
+- [x] Select org for project
 
 Developers
 
 - [x] Profile config page / read and update user info
 - [x] Developers page
+- [x] Navigate to organizations on click
+- [x] Developer Organizations
+- [ ] Optional Location (ITESM campus)
 - [ ] Developer Links
 - [ ] Developer Work experience
-- [ ] Developer Organizations
 
 Organizations
 
 - [x] Create Organization
 - [x] Organization page read
+- [x] Projects of organization
+- [x] Logo for organization
+- [x] Back on edit organization
