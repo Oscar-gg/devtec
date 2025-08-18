@@ -65,10 +65,14 @@ export const authConfig = {
       // Check if primary email has the allowed domain
       if (profile?.email?.endsWith(`@${allowedDomain}`)) {
         if (user.id) {
-          await db.user.update({
-            where: { id: user.id },
-            data: { schoolEmail: profile.email, originalImage: user.image },
-          });
+          try {
+            await db.user.update({
+              where: { id: user.id },
+              data: { schoolEmail: profile.email, originalImage: user.image },
+            });
+          } catch (error) {
+            console.error("Error updating user:", error);
+          }
         }
         return true;
       }
@@ -80,10 +84,14 @@ export const authConfig = {
         for (const email of associatedEmails) {
           if (email.verified && email.email.endsWith(`@${allowedDomain}`)) {
             if (user.id) {
-              await db.user.update({
-                where: { id: user.id },
-                data: { schoolEmail: email.email, originalImage: user.image },
-              });
+              try {
+                await db.user.update({
+                  where: { id: user.id },
+                  data: { schoolEmail: email.email, originalImage: user.image },
+                });
+              } catch (error) {
+                console.error("Error updating user:", error);
+              }
             }
 
             return true;
