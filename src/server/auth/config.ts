@@ -67,6 +67,12 @@ export const authConfig = {
             userId: user.id,
           },
         });
+        await db.user.update({
+          where: { id: user.id },
+          data: {
+            originalImage: user.image,
+          },
+        });
       }
     },
   },
@@ -83,7 +89,7 @@ export const authConfig = {
           try {
             await db.user.update({
               where: { id: user.id },
-              data: { schoolEmail: profile.email, originalImage: user.image },
+              data: { schoolEmail: profile.email },
             });
           } catch (error) {
             console.error("Error updating user:", error);
@@ -105,7 +111,7 @@ export const authConfig = {
               try {
                 await db.user.update({
                   where: { id: user.id },
-                  data: { schoolEmail: email.email, originalImage: user.image },
+                  data: { schoolEmail: email.email },
                 });
               } catch (error) {
                 console.error("Error updating user:", error);
