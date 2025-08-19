@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { ReactNode } from "react";
+import { cn } from "~/utils/frontend/classnames";
 
 export interface DropdownItem {
   label: string;
@@ -41,8 +42,8 @@ export const Dropdown = ({ trigger, items, className = "" }: DropdownProps) => {
   };
 
   return (
-    <div className={`relative ${className}`} ref={dropdownRef}>
-      <button onClick={() => setIsOpen(!isOpen)} className="focus:outline-none">
+    <div className={cn("relative", className)} ref={dropdownRef}>
+      <button onClick={() => setIsOpen(!isOpen)} className="flex items-center justify-center focus:outline-none">
         {trigger}
       </button>
 
