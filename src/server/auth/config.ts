@@ -72,10 +72,13 @@ export const authConfig = {
   },
   callbacks: {
     async signIn({ profile, account, user }) {
-      const allowedDomain = "tec.mx";
+      const allowedDomains = ["@tec.mx", "@exatec.mx"];
 
       // Check if primary email has the allowed domain
-      if (profile?.email?.endsWith(`@${allowedDomain}`)) {
+      if (
+        profile?.email &&
+        allowedDomains.some((domain) => profile?.email?.endsWith(domain))
+      ) {
         if (user.id) {
           try {
             await db.user.update({
@@ -94,7 +97,10 @@ export const authConfig = {
         const associatedEmails = await getEmails(account?.access_token);
 
         for (const email of associatedEmails) {
-          if (email.verified && email.email.endsWith(`@${allowedDomain}`)) {
+          if (
+            email.verified &&
+            allowedDomains.some((domain) => email.email.endsWith(domain))
+          ) {
             if (user.id) {
               try {
                 await db.user.update({

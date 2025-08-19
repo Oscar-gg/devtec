@@ -14,7 +14,7 @@ const errorMessages: Record<string, { title: string; description: string }> = {
   AccessDenied: {
     title: "Access Denied",
     description:
-      "You don't have permission to log in to the application. Ensure your GitHub account has a verified @tec.mx email address linked.",
+      "You don't have permission to log in to the application. Ensure your GitHub account has a verified @tec.mx/@exatec.mx email address linked.",
   },
   Verification: {
     title: "Email Verification Required",
@@ -66,7 +66,6 @@ const errorMessages: Record<string, { title: string; description: string }> = {
 function AuthErrorPage() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error") ?? "Default";
-
   const errorInfo = errorMessages[error] ?? errorMessages.Default!;
 
   return (
