@@ -7,6 +7,14 @@
   --color-devtec: #8b5cf6;
 }
 
+@layer components {
+  .wrap-properly {
+    word-wrap: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+}
+
 /* Custom scrollbar for dark theme */
 ::-webkit-scrollbar {
   width: 8px;

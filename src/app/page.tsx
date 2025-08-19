@@ -40,7 +40,7 @@ export default function ProjectsPage() {
           </div>
         </div>
 
-        {/* Repository Grid */}
+        {/* Project Grid */}
         <div className="lg:col-span-2">
           <ProjectGrid
             searchText={filter.searchText}

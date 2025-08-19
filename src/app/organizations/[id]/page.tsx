@@ -130,7 +130,7 @@ function OrganizationPage() {
               <h2 className="mb-4 text-xl font-semibold text-[#E0E0E0]">
                 Members
               </h2>
-              <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {organizationData.user.length > 0 &&
                   organizationData.user.map((user) => (
                     <SummarizedCard

@@ -77,11 +77,11 @@ export const ProjectCard = ({
         <div className="mb-4 flex items-start justify-between">
           <div className="flex-1">
             <div className="mb-2 flex items-center space-x-2">
-              <h3 className="text-lg font-semibold text-[#E0E0E0] transition-colors duration-200 group-hover:text-[#3B82F6]">
+              <h3 className="wrap-properly line-clamp-2 text-lg font-semibold text-[#E0E0E0] transition-colors duration-200 group-hover:text-[#3B82F6] md:line-clamp-1">
                 {project?.name}
               </h3>
             </div>
-            <p className="text-sm leading-relaxed text-[#A0A0A0]">
+            <p className="line-clamp-4 text-sm leading-relaxed text-[#A0A0A0] md:line-clamp-2">
               {project?.description}
             </p>
           </div>
@@ -89,7 +89,7 @@ export const ProjectCard = ({
       </Link>
 
       {/* Repository Stats */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between space-y-3 space-x-3">
         <Link className="cursor-pointer" href={`/projects/${projectId}`}>
           <div className="flex items-center space-x-6">
             {/* Language */}
@@ -180,7 +180,7 @@ export const ProjectCardSkeleton = ({
       </div>
 
       {/* Repository Stats Skeleton */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between space-y-3 space-x-3">
         <div className="flex items-center space-x-6">
           {/* Language Skeleton */}
           <div className="flex items-center space-x-2">

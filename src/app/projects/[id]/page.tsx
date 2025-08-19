@@ -121,7 +121,8 @@ export default function ProjectDetailPage() {
             </p>
           </div>
           <Link href="/">
-            <Button>
+            <Button className="mx-auto flex flex-row items-center">
+              {/* <Button> */}
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
               Back to Projects
             </Button>
@@ -149,13 +150,13 @@ export default function ProjectDetailPage() {
 
         {/* Project Header */}
         <div className="mb-8">
-          <div className="mb-4 flex items-start justify-between">
+          <div className="mb-4 flex flex-wrap items-start justify-between space-y-4 space-x-3">
             <div className="flex items-center space-x-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-[#8B5CF6] to-[#3B82F6]">
-                <ProjectIcon className="h-6 w-6 text-white" />
+                <ProjectIcon className="h-8 w-12 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-[#E0E0E0]">
+                <h1 className="wrap-properly line-clamp-1 text-3xl font-bold text-[#E0E0E0]">
                   {project.name}
                 </h1>
                 <div className="mt-1 flex items-center space-x-4">
