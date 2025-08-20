@@ -5,7 +5,6 @@ const GitHubEmailSchema = z.object({
   email: z.string(),
   primary: z.boolean(),
   verified: z.boolean(),
-  visibility: z.union([z.literal("public"), z.literal("private")]).nullish(),
 });
 
 export const getEmails = async (
@@ -28,9 +27,9 @@ export const getEmails = async (
 const GitHubProjectSchema = z.object({
   full_name: z.string(),
   description: z.string().nullish(),
-  stargazers_count: z.number().optional(),
-  language: z.string().optional(),
-  forks_count: z.number().optional(),
+  stargazers_count: z.number().nullish(),
+  language: z.string().nullish(),
+  forks_count: z.number().nullish(),
 });
 
 export const getRepositoryData = async ({

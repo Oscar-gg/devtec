@@ -44,6 +44,7 @@ export const projectsRouter = createTRPCRouter({
               accessToken: accessToken,
               repoUrl: input.githubUrl,
             });
+
             stars = githubData.stargazers_count;
             forks = githubData.forks_count;
           }
