@@ -21,7 +21,7 @@ DevTec aims to be a place where developers can:
 
 ## Technologies
 
-This project is built with the [T3 Stack](https://create.t3.gg/):
+See [architecture](./docs/devtec_architecture.drawio.xml) for component overview details. This project is built with the [T3 Stack](https://create.t3.gg/):
 
 ### Core Framework
 
