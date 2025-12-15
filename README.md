@@ -52,6 +52,52 @@ Contributions are welcome (and appreciated)!
 
 For more information, see [Contributing Guidelines](CONTRIBUTING.md) before investing your time.
 
+## Running Locally
+
+1. Clone & install dependencies:
+
+```bash
+git clone https://github.com/Oscar-gg/devtec
+cd devtec
+npm install
+```
+
+2. Set up environment variables:
+
+Create a `.env` file in the root directory and add the necessary environment variables. You can use the `.env.example` file as a reference. For setting up a database, you can use the [start-database.sh](./scripts/start-database.sh) script to run a local PostgreSQL instance using Docker.
+
+3. Run the development server:
+
+```bash
+npm run dev
+```
+
+## Useful Prisma database commands
+
+1. Pull the latest schema changes from the Database
+
+```bash
+npx prisma db pull
+```
+
+2. Push the local schema changes to the Database
+
+```bash
+npx prisma db push
+```
+
+3. Generate Prisma Client
+
+```bash
+npx prisma generate
+```
+
+4. Inspect the database
+
+```bash
+npx prisma studio
+```
+
 ## Roadmap
 
 Deployment
